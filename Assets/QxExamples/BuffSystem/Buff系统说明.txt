@@ -1,0 +1,20 @@
+Buff系统说明
+by 菊花QAQ
+
+1、内容物（2个脚本）：
+	BuffManager.cs
+	Buff.cs
+
+2、相关类的简介：
+	DataChanger负责记录buff对各种属性产生的影响（例如降低移速的比率）
+	Buff是所有buff的基类，创建新的buff需要继承该基类，负责实现特定的效果（例如修改人物的某些属性、播放某些特效等）
+	BuffManager需要挂在会被施加buff的人物上（或者说场上的gameObject），负责管理该人物身上所有的buff及其添加/删除，人物通过获取BuffManager中的DaTaChanger来获取当前所有被影响属性该如何修改。
+
+3、可能需要注意的事项：
+	DataChanger内需要包括所有会被buff影响到的属性（记得设置为public），其系数的类需要以IndexOperator为基类；
+	为了减少修改DataChanger包含的属性种类会带来的麻烦，DataChanger重载的+-号中使用了反射。如果不需要可以自行注释掉；
+	Buff类中的Refresh函数可以视作Update，Refresh会由它所属的BuffManager的Update函数每帧刷新；
+	受buff影响的人物需要自行处理这些系数如何影响对应的人物数据。
+
+4、示例说明：
+	运行该文件夹下对应的场景即可。通过按右上角的三个按钮可以对场上左右移动的物体添加对应的buff。在该示例中，相同种类的buff会自动叠加持续时间和积累槽而非生成一个新的buff。如果需要实现生成新buff，可以通过修改BuffManager中添加buff的函数实现。
