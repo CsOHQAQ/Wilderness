@@ -30,6 +30,8 @@ namespace QxFramework.Core
             _modules.Add(MessageManager.Instance);
             _modules.Add(ResourceManager.Instance);
             _modules.Add(LevelManager.Instance);
+            _modules.Add(InputManager.Instance);
+            _modules.Add(LoadSceneManager.Instance);
 
             for (int i = 0; i < _modules.Count; i++)
             {

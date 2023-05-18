@@ -106,6 +106,7 @@ namespace QxFramework.Core
         /// </summary>
         protected virtual void OnEnter(object args)
         {
+            Debug.Log("#Procedure正在进入" + this);
         }
 
         /// <summary>
@@ -129,6 +130,7 @@ namespace QxFramework.Core
         /// </summary>
         protected virtual void OnLeave()
         {
+            Debug.Log("#Procedure正在离开" + this);
         }
 
         /// <summary>

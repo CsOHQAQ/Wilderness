@@ -145,6 +145,7 @@ public partial class ChildBindTool
         }
         if (!Gos.ContainsKey(name))
         {
+            Debug.LogError("未找到名为" + name + "的子物体！");
             throw new ArgumentNullException(name);
         }
 

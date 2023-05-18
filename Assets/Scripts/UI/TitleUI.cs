@@ -5,10 +5,11 @@ using QxFramework.Core;
 using UnityEngine.UI;
 public class TitleUI : UIBase
 {
+
     public override void OnDisplay(object args)
     {
         base.OnDisplay(args);
-        Get<Button>("StartButton").onClick.SetListener(StartGame);
+        Get<Button>("StartBtn").onClick.SetListener(StartGame);
     }
     protected override void OnClose()
     {
@@ -16,6 +17,7 @@ public class TitleUI : UIBase
     }
     void StartGame()
     {
-        ProcedureManager.Instance.ChangeTo("SelectProcedure");
+        ProcedureManager.Instance.ChangeTo<LoadSceneProcedure>();
     }
+
 }

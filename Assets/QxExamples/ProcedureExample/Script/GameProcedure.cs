@@ -8,11 +8,17 @@ public class GameProcedure : ProcedureBase {
     protected override void OnEnter(object args)
     {
         base.OnEnter(args);
-        AddSubmodule(new GameControlModule());
+        PlayerBase player = ResourceManager.Instance.Instantiate("Prefabs/Player/Player").GetComponent<PlayerBase>();
+        player.Init();
     }
 
     protected override void OnLeave()
     {
         base.OnLeave();
+    }
+    protected override void OnUpdate(float elapseSeconds)
+    {
+        base.OnUpdate(elapseSeconds);
+        Debug.Log("#Procedure试试看呢");
     }
 }
