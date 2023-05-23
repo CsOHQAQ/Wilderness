@@ -11,6 +11,7 @@ public class Titlemodule : Submodule {
     {
         QXData.Instance.SetTableAgent();
         GameMgr.Instance.InitModules();
+        Debug.Log(GameMgr.Get<IGameTimeManager>().GetNow().ToString());
         title= UIManager.Instance.Open("TitleUI");
     }
     //在切换流程时会将上一流程的子模块destory掉

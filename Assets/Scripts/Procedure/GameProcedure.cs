@@ -5,11 +5,21 @@ using UnityEngine;
 
 public class GameProcedure : ProcedureBase {
 
+    private MapManager mapManager;
+    private CameraController cam;
     protected override void OnEnter(object args)
     {
         base.OnEnter(args);
+
         PlayerBase player = ResourceManager.Instance.Instantiate("Prefabs/Player/Player").GetComponent<PlayerBase>();
         player.Init();
+        UIManager.Instance.Open("CreateMapHintUI");
+        mapManager = GameObject.Find("MapManager").GetComponent<MapManager>();
+        mapManager.Init(player);
+        UIManager.Instance.Close("CreateMapHintUI");
+        cam = Camera.main.GetComponent<CameraController>();
+        cam.Init(player);
+        cam.needFollow = true;
     }
 
     protected override void OnLeave()

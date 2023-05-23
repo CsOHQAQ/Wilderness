@@ -2,24 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
 using QxFramework.Core;
 public class MapManager:MonoBehaviour
 {
+    private bool isInited = false;
+    /*
     private Tilemap backgroundTilemap;
     //用于上层地面的tilemap
     private Tilemap decorationTilemap_Ground;
     //用于记录地面上装饰（如花朵）的tilemap
     private Tilemap decorationTilemap_Object;
-
+    
     //分别对应上述tilemap的tile，需要在场景中提前设置
-    public Tile backgroundTile;
-    public Tile decGroundTile;
-    public Tile decObjTile;
+    public TileBase backgroundTile;
+    public TileBase decGroundTile;
+    public TileBase decObjTile;
+    */
 
     private PlayerBase player;
     //最远刷新区域中心离玩家多远
     private float refreshArea = 100f;
-    //所有创建的区块表
+    //区块半径(暂时不建议修改，因为预设挺难调的)
+    private int blockSize = 20;
+    //所有创建的区块表，索引为区块左下角的坐标
     public Dictionary<Vector2Int, MapBlock> mapBlocks;
     //需要刷新的区块列表
     public List<MapBlock> refreshingMapBlocks;
@@ -28,13 +34,115 @@ public class MapManager:MonoBehaviour
     public void Init(PlayerBase playerBase)
     {
         player = playerBase;
-        backgroundTilemap = transform.Find("Background").GetComponent<Tilemap>();
-        decorationTilemap_Ground= transform.Find("Decoration_Ground").GetComponent<Tilemap>();
-        decorationTilemap_Object = transform.Find("Decoration_Object").GetComponent<Tilemap>();
-
         mapBlocks = new Dictionary<Vector2Int, MapBlock>();
         //如果有存档就在这里写读取罢！
-
+        for(int i = -4; i <= 4; i++)
+        {
+            for(int j = -4; j <= 4; j++)
+            {
+                CreateMapBlock(new Vector2Int(i, j) * 2 * blockSize, true);
+            }
+        }
+        Debug.Log("#Map完成地图块初始生成");
+        isInited = true;//完成初始化，可以开始Update
     }
 
+    public void Update()
+    {
+        if (!isInited)//防止在未初始化时运行
+            return;
+
+        Debug.Log("#Map开始刷新MapManager");
+
+        //检查玩家是否会看见未加载区块
+        int viewAreaHeight = (int)Camera.main.orthographicSize / (blockSize * 2);
+        int viewAreaWidth = (int)(Camera.main.orthographicSize*Camera.main.aspect / (blockSize * 2));
+        for(int i = -viewAreaHeight - 2; i <= viewAreaHeight +2; i++)
+        {
+            for(int j = -viewAreaWidth - 2; j <= viewAreaWidth + 2; j++)
+            {
+                Vector2Int blockPos = new Vector2Int(playerPos2MapBlockPos().x+j*2*blockSize,playerPos2MapBlockPos().y+i*2*blockSize );
+                if (!mapBlocks.ContainsKey(blockPos))
+                {
+                    Debug.Log($"#Map 在{blockPos}位置创建新的区块");
+                    CreateMapBlock(blockPos);
+                }
+            }
+        }
+
+        
+
+
+        ShowBlockArea();//在Scene中显示区块的大小
+    }
+
+    private void CreateMapBlock(Vector2Int mapBlockPos, bool instantCreate = false)
+    {
+        GameObject block = ResourceManager.Instance.Instantiate("Prefabs/Grid/BackgroundGrid");
+        block.name = ($"block_({mapBlockPos.x},{mapBlockPos.y})");
+        block.transform.position = new Vector3(mapBlockPos.x, mapBlockPos.y);
+        block.transform.parent = this.transform;
+        block.GetComponent<MapBlock>().Position = mapBlockPos;
+        mapBlocks.Add(mapBlockPos, block.GetComponent<MapBlock>());
+        /*
+        for(int x=mapBlockPos.x; x < mapBlockPos.x + blockSize * 2; x++)
+        {
+            for(int y = mapBlockPos.y; y < mapBlockPos.y + blockSize * 2; y++)
+            {
+                backgroundTilemap.SetTile(new Vector3Int(x, y, 0), backgroundTile);//先设置这一区块所有的底层tile
+            }
+        }
+        */
+        /*
+        for (int i = 0; i < blockSize * 2; i++)
+        {
+            for(int j = 0; j < blockSize * 2; j++)
+            {
+                if (decMap[i][j] ==1)
+                {
+                    decorationTilemap_Ground.SetTile(new Vector3Int(mapBlockPos.x+j,mapBlockPos.y+i,0),decGroundTile);
+                }
+            }
+        }
+        */
+        block.GetComponent<MapBlock>().Init(instantCreate);
+    }
+
+
+
+
+    private void ShowBlockArea()
+    {
+        foreach (var block in mapBlocks.Values)
+        {
+            Vector3 leftDown =new Vector3(block.Position.x,block.Position.y),
+                leftUp=new Vector3(block.Position.x, block.Position.y+blockSize*2),
+                rightDown=new Vector3(block.Position.x+blockSize*2,block.Position.y),
+                rightUp=new Vector3(block.Position.x + blockSize * 2, block.Position.y+blockSize*2);
+            Debug.DrawLine(leftDown,leftUp,Color.red);
+            Debug.DrawLine(leftDown, rightDown, Color.red);
+            Debug.DrawLine(rightUp, leftUp, Color.red);
+            Debug.DrawLine(rightUp, rightDown, Color.red);
+        }
+
+    }
+    
+    private Vector2Int playerMapPos()
+    { 
+        int x=0,y=0;
+        x = (int)((Mathf.Abs(player.transform.position.x) + 0.5f) * Mathf.Sign(player.transform.position.x));
+        y = (int)((Mathf.Abs(player.transform.position.y) + 0.5f) * Mathf.Sign(player.transform.position.y));
+        return new Vector2Int(x, y);
+    }
+
+    private Vector2Int playerPos2MapBlockPos()
+    {
+        Vector2Int playerPos = playerMapPos();
+        int x = 0, y = 0;
+        x+= playerPos.x / (2 * blockSize);
+        x -= playerPos.x < 0 ? 1 : 0;
+        y+= playerPos.y / (2 * blockSize);
+        y -= playerPos.y < 0 ? 1 : 0;
+        return new Vector2Int(x*2*blockSize,y*2*blockSize);
+    }
 }

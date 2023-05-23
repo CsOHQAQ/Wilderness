@@ -30,31 +30,35 @@ public class PlayerBase: MonoBehaviour
 
     public void Move()
     {
-        bool isMove = false;
-        Debug.Log("#Player 正在检测移动");
+        bool isMoveX = false;
+        bool isMoveY = false;
         if (InputManager.Instance.GetButton(InputEnum.Up)&&(!InputManager.Instance.GetButton(InputEnum.Down)))//向上移动
         {
-            isMove = true;
+            isMoveY = true;
             body.velocity = new Vector2(body.velocity.x, data.Velocity);
         }
         if(InputManager.Instance.GetButton(InputEnum.Down) && (!InputManager.Instance.GetButton(InputEnum.Up)))
         {
-            isMove = true;
+            isMoveY = true;
             body.velocity = new Vector2(body.velocity.x, -data.Velocity);
         }
         if (InputManager.Instance.GetButton(InputEnum.Left) && (!InputManager.Instance.GetButton(InputEnum.Right)))//向上移动
         {
-            isMove = true;
+            isMoveX = true;
             body.velocity = new Vector2(-data.Velocity, body.velocity.y);
         }
         if (InputManager.Instance.GetButton(InputEnum.Right) && (!InputManager.Instance.GetButton(InputEnum.Left)))//向上移动
         {
-            isMove = true;
+            isMoveX = true;
             body.velocity = new Vector2(data.Velocity, body.velocity.y);
         }
-        if (!isMove)
+        if (!isMoveX)
         {
-            body.velocity = new Vector2(Mathf.Max(0,body.velocity.x-data.Velocity/5), Mathf.Max(0, body.velocity.y - data.Velocity / 5));
+            body.velocity = new Vector2(Mathf.Max(0,body.velocity.x-data.Velocity/5), body.velocity.y);
+        }
+        if (!isMoveY)
+        {
+            body.velocity = new Vector2(body.velocity.x ,Mathf.Max(0, body.velocity.y - data.Velocity / 5));
         }
     }
 
