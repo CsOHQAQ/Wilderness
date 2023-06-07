@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using QxFramework.Core;
-
+using System;
 
 public class PlayerBase: MonoBehaviour
 {
@@ -10,6 +10,11 @@ public class PlayerBase: MonoBehaviour
     [HideInInspector]
     public Rigidbody2D body;
     public bool canMove = true;
+    public float environmentTemp = 100f;
+
+    private Action<PlayerBase> interactFunc;
+    private PlayerStateUI stateUI;
+    private BackPackUI backPackUI;
     public void Init(bool load=false)
     {
         body = GetComponent<Rigidbody2D>();
@@ -22,10 +27,18 @@ public class PlayerBase: MonoBehaviour
         data = new PlayerData();
         data.Init();
         canMove = true;
+        stateUI = UIManager.Instance.Open("PlayerStateUI",2,"",this).GetComponent<PlayerStateUI>();
+        backPackUI = UIManager.Instance.Open("BackPackUI",2,"",new CargoData[] { data.backpack } ).GetComponent<BackPackUI>();
+    }
+    public void SetInteractFunc(Action<PlayerBase> action)
+    {
+        interactFunc = action;
     }
     private void Update()
     {
         Move();
+        Interact();
+        data.RefreshData(environmentTemp);
     }
 
     public void Move()
@@ -62,8 +75,11 @@ public class PlayerBase: MonoBehaviour
         }
     }
 
-    public void RefreshData()
+    public void Interact()
     {
-
+        if (InputManager.Instance.GetButtonDown(InputEnum.Interact))
+        {
+            interactFunc.Invoke(this);
+        }
     }
 }

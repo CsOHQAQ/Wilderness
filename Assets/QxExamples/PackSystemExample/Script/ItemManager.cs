@@ -5,6 +5,7 @@ public class ItemManager : LogicModuleBase,IItemManager
 {
     public ItemData _itemData;
     public Dictionary<int, Item> Items = new Dictionary<int, Item>();
+    static public Dictionary<string, int> ItemsID = new Dictionary<string, int>();
     public override void Init()
     {
         base.Init();
@@ -25,10 +26,12 @@ public class ItemManager : LogicModuleBase,IItemManager
             item.ItemPrice = QxFramework.Core.QXData.Instance.TableAgent.GetInt("Items", AllItemsStatus[i].ToString(), "Price");
             item.ItemImg = QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Image");
             item.ItemName = QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Name");
+            item.ItemCodeName = QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "CodeName");
             item.ItemDescription = QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Description");
             item.ItemType = (ItemType)System.Enum.Parse(typeof(ItemType),QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Type"));
             item.MaxPile = QxFramework.Core.QXData.Instance.TableAgent.GetInt("Items", AllItemsStatus[i].ToString(), "MaxPile");
             Items.Add(int.Parse(AllItemsStatus[i]), item);
+            ItemsID.Add(item.ItemCodeName, item.ItemID);
         }
     }
     private void InitItemData()
@@ -47,25 +50,6 @@ public class ItemManager : LogicModuleBase,IItemManager
     //数据也最好读表而不要写在代码里
     public void RefeshBattery()
     {
-        _itemData.PlayerCargo.MaxBattery = 8;
-        AddItem(1001, 2, _itemData.PlayerCargo);
-        AddItem(1002, 3, _itemData.PlayerCargo);
-        AddItem(1003, 4, _itemData.PlayerCargo);
-        _itemData.GroundCargo.MaxBattery = 6;
-        AddItem(2001, 3, _itemData.GroundCargo);
-        AddItem(2002, 3, _itemData.GroundCargo);
-        AddItem(2003, 3, _itemData.GroundCargo);
-        AddItem(2004, 3, _itemData.GroundCargo);
-        _itemData.ShopCargo.MaxBattery = 4;
-        _itemData.ShopCargo.IsShop = true;
-        AddItem(1001, 3, _itemData.ShopCargo);
-        AddItem(1002, 3, _itemData.ShopCargo);
-        AddItem(1003, 3, _itemData.ShopCargo);
-        AddItem(2001, 3, _itemData.ShopCargo);
-        AddItem(2002, 1, _itemData.ShopCargo);
-        AddItem(2003, 1, _itemData.ShopCargo);
-        AddItem(2004, 2, _itemData.ShopCargo);
-        _itemData.PlayerMoney = 50;
     }
     private Item CreateItem(int ID)
     {
@@ -95,7 +79,7 @@ public class ItemManager : LogicModuleBase,IItemManager
         while (Count > 0)
         {
             Count--;
-            bool MaxPile = true; ;
+            bool MaxPile = true;
             for (int i = 0; i < cargo.itemPiles.Count; i++)
             {
                 if (cargo.itemPiles[i].item.ItemID == Id && cargo.itemPiles[i].CurrentPile < cargo.itemPiles[i].item.MaxPile)
@@ -122,6 +106,7 @@ public class ItemManager : LogicModuleBase,IItemManager
                 return false;
             }
         }
+        RefreshAllCargoUI();
         return true;
     }
     public bool RemoveItem(int PosId, int Count, CargoData[] cargo)
@@ -145,6 +130,7 @@ public class ItemManager : LogicModuleBase,IItemManager
                 }
             }
         }
+        RefreshAllCargoUI();
         return true;
     }
     public bool RemoveItemByID(int ItemID, int Count, CargoData[] cargo)
@@ -168,6 +154,7 @@ public class ItemManager : LogicModuleBase,IItemManager
                 }
             }
         }
+        RefreshAllCargoUI();
         return true;
     }
     public bool RemoveItemByID(int ItemID, int Count)
@@ -192,6 +179,7 @@ public class ItemManager : LogicModuleBase,IItemManager
                 }
             }
         }
+        RefreshAllCargoUI();
         return true;
     }
     public bool CheckItemEnough(int ItemID, int Count, CargoData[] cargo)
@@ -339,6 +327,7 @@ public class ItemManager : LogicModuleBase,IItemManager
                 }
             }
         }
+        RefreshAllCargoUI();
         return true;
     }
     public void ResolvePackage(CargoData cargo)
@@ -538,6 +527,7 @@ public class Item
     public int ItemID = 1001;
     public int ItemPrice = 1001;
     public string ItemImg = "";
+    public string ItemCodeName = "";
     public string ItemName = "";
     public string ItemDescription = "";
     public string ItemFunc = "";

@@ -26,15 +26,16 @@ public class MapManager:MonoBehaviour
     //区块半径(暂时不建议修改，因为预设挺难调的)
     private int blockSize = 20;
     //所有创建的区块表，索引为区块左下角的坐标
-    public Dictionary<Vector2Int, MapBlock> mapBlocks;
+    public Dictionary<Vector2Int, MapBlock> mapBlocks=new Dictionary<Vector2Int, MapBlock>();
     //需要刷新的区块列表
-    public List<MapBlock> refreshingMapBlocks;
+    public List<MapBlock> refreshingMapBlocks=new List<MapBlock>();
+    private List<MapBlock> removeRecord = new List<MapBlock>();
     
     //开始进入时的初始化，还没有接入存档系统
     public void Init(PlayerBase playerBase)
     {
         player = playerBase;
-        mapBlocks = new Dictionary<Vector2Int, MapBlock>();
+        player.SetInteractFunc(Interact);
         //如果有存档就在这里写读取罢！
         for(int i = -4; i <= 4; i++)
         {
@@ -52,8 +53,6 @@ public class MapManager:MonoBehaviour
         if (!isInited)//防止在未初始化时运行
             return;
 
-        Debug.Log("#Map开始刷新MapManager");
-
         //检查玩家是否会看见未加载区块
         int viewAreaHeight = (int)Camera.main.orthographicSize / (blockSize * 2);
         int viewAreaWidth = (int)(Camera.main.orthographicSize*Camera.main.aspect / (blockSize * 2));
@@ -67,11 +66,33 @@ public class MapManager:MonoBehaviour
                     Debug.Log($"#Map 在{blockPos}位置创建新的区块");
                     CreateMapBlock(blockPos);
                 }
+
+                if (!refreshingMapBlocks.Contains(mapBlocks[blockPos]))
+                {
+                    mapBlocks[blockPos].EnterRefresh(GameMgr.Get<IGameTimeManager>().GetNow());
+                    refreshingMapBlocks.Add(mapBlocks[blockPos]);
+                }
             }
         }
 
-        
+        foreach(var block in refreshingMapBlocks)
+        {
+            if (Vector2.Distance(block.leftDownPosition, playerMapPos()) > refreshArea)
+            {
+                block.ExitRefresh();
+                removeRecord.Add(block);
+            }
+            else
+            {
+                block.Refresh(GameMgr.Get<IGameTimeManager>().GetNow());
+            }
+        }
 
+        foreach(var reblock in removeRecord)
+        {
+            refreshingMapBlocks.Remove(reblock);
+        }
+        removeRecord.Clear();
 
         ShowBlockArea();//在Scene中显示区块的大小
     }
@@ -82,7 +103,7 @@ public class MapManager:MonoBehaviour
         block.name = ($"block_({mapBlockPos.x},{mapBlockPos.y})");
         block.transform.position = new Vector3(mapBlockPos.x, mapBlockPos.y);
         block.transform.parent = this.transform;
-        block.GetComponent<MapBlock>().Position = mapBlockPos;
+        block.GetComponent<MapBlock>().leftDownPosition = mapBlockPos;
         mapBlocks.Add(mapBlockPos, block.GetComponent<MapBlock>());
         /*
         for(int x=mapBlockPos.x; x < mapBlockPos.x + blockSize * 2; x++)
@@ -108,23 +129,37 @@ public class MapManager:MonoBehaviour
         block.GetComponent<MapBlock>().Init(instantCreate);
     }
 
-
+    private void Interact(PlayerBase player)
+    {
+        MapBlock curBlock = mapBlocks[playerPos2MapBlockPos()];
+        curBlock.Interact(player);
+    }
 
 
     private void ShowBlockArea()
     {
         foreach (var block in mapBlocks.Values)
         {
-            Vector3 leftDown =new Vector3(block.Position.x,block.Position.y),
-                leftUp=new Vector3(block.Position.x, block.Position.y+blockSize*2),
-                rightDown=new Vector3(block.Position.x+blockSize*2,block.Position.y),
-                rightUp=new Vector3(block.Position.x + blockSize * 2, block.Position.y+blockSize*2);
+            Vector3 leftDown =new Vector3(block.leftDownPosition.x,block.leftDownPosition.y),
+                leftUp=new Vector3(block.leftDownPosition.x, block.leftDownPosition.y+blockSize*2),
+                rightDown=new Vector3(block.leftDownPosition.x+blockSize*2,block.leftDownPosition.y),
+                rightUp=new Vector3(block.leftDownPosition.x + blockSize * 2, block.leftDownPosition.y+blockSize*2);
             Debug.DrawLine(leftDown,leftUp,Color.red);
             Debug.DrawLine(leftDown, rightDown, Color.red);
             Debug.DrawLine(rightUp, leftUp, Color.red);
             Debug.DrawLine(rightUp, rightDown, Color.red);
         }
-
+        foreach(var block in refreshingMapBlocks)
+        {
+            Vector3 leftDown = new Vector3(block.leftDownPosition.x, block.leftDownPosition.y),
+                leftUp = new Vector3(block.leftDownPosition.x, block.leftDownPosition.y + blockSize * 2),
+                rightDown = new Vector3(block.leftDownPosition.x + blockSize * 2, block.leftDownPosition.y),
+                rightUp = new Vector3(block.leftDownPosition.x + blockSize * 2, block.leftDownPosition.y + blockSize * 2);
+            Debug.DrawLine(leftDown, leftUp, Color.blue);
+            Debug.DrawLine(leftDown, rightDown, Color.blue);
+            Debug.DrawLine(rightUp, leftUp, Color.blue);
+            Debug.DrawLine(rightUp, rightDown, Color.blue);
+        }
     }
     
     private Vector2Int playerMapPos()

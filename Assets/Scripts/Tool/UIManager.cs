@@ -109,7 +109,7 @@ namespace QxFramework.Core
             //实例化UI
 
             GameObject ui = ResourceManager.Instance.Instantiate(FoldPath + uiName, parent);
-            ui.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            //ui.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
             if (name != "")
             {

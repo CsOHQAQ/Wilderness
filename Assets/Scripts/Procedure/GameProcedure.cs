@@ -29,6 +29,5 @@ public class GameProcedure : ProcedureBase {
     protected override void OnUpdate(float elapseSeconds)
     {
         base.OnUpdate(elapseSeconds);
-        Debug.Log("#Procedure试试看呢");
     }
 }

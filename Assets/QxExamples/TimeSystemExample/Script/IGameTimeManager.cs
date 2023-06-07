@@ -6,6 +6,7 @@ public interface IGameTimeManager
 {
     float TimeSize { get; set; }
     GameDateTime GetNow();
+    float GetNowLight();
     void DoStart();
     void Pause();
     bool IsPlaying();

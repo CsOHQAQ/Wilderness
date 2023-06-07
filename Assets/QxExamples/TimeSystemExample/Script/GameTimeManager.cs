@@ -18,6 +18,7 @@ public class GameTimeManager : LogicModuleBase, IGameTimeManager
     private bool _playing = false;
 
     public NowTimeData NowTime;
+    public float NowLight = 1;
     private readonly List<Func<bool>> _pauseConditions = new List<Func<bool>>();
 
     /// <summary>
@@ -27,7 +28,7 @@ public class GameTimeManager : LogicModuleBase, IGameTimeManager
 
     public bool IsStop => !_playing;
 
-    private float _timeSize = 1;
+    private float _timeSize = 1;//现实世界中_timeSize秒过游戏内1分钟
     public float TimeSize { get => _timeSize; set => _timeSize = value; }
 
     public override void Init()
@@ -169,6 +170,11 @@ public class GameTimeManager : LogicModuleBase, IGameTimeManager
     public GameDateTime GetNow()
     {
         return NowTime.Now;
+    }
+
+    public float GetNowLight()
+    {
+        return NowLight;
     }
 
 }
