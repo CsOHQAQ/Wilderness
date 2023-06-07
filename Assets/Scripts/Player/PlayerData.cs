@@ -94,7 +94,9 @@ public class PlayerData
         Position = new Vector2(0,0);
         backpack = new CargoData();
         backpack.MaxBattery = 7;
+        ResetState();
     }
+    
     public void ResetState()
     {
         health = maxHealth;
@@ -105,29 +107,30 @@ public class PlayerData
     //每次update刷新一次
     public void RefreshData(float environmentTemp)
     {
-        float consumeHungerDay = MaxHunger / (Time.deltaTime*60*24);//分子是消耗的hunger，分母(去掉deltaTime的常数部分)是游戏中经过的分钟
-        float consumeTemperatureHour = (environmentTemp-temperature) * 4 / (Time.deltaTime * 60);
+        //deltaTime*frames=1
+        float consumeHungerDay = MaxHunger*Time.deltaTime / (60*24);//分子是消耗的hunger，分母是游戏中经过的分钟
+        
+        float consumeTemperatureHour = (environmentTemp-temperature) * 4 * Time.deltaTime/ 60;
          
-        ChangeHunger(consumeHungerDay);
-        ChangeTemperature(consumeTemperatureHour);
+        ChangeHunger(-consumeHungerDay);
+        ChangeTemperature(-consumeTemperatureHour);
         if (Hunger > (3 * MaxHunger / 4)&&Temperature>(3*MaxTemperature))
         {
-            ChangeHealth(MaxHealth / (Time.deltaTime * 8));
+            ChangeHealth(MaxHealth* Time.deltaTime  / (60*12));
         }
         if (Hunger < MaxHunger / 3)
         {
-            ChangeHealth(-MaxHealth / (Time.deltaTime * 10));
+            ChangeHealth(-MaxHealth * Time.deltaTime / ( 60*6));
         }
         if (Temperature> (3 * MaxTemperature / 4) && Temperature > (3 * MaxTemperature))
         {
-            ChangeHealth(MaxHealth / (Time.deltaTime * 8));
+            ChangeHealth(MaxHealth * Time.deltaTime /8);
         }
         if (Temperature < MaxTemperature / 3)
         {
-            ChangeHealth(-MaxHealth / (Time.deltaTime * 10));
+            ChangeHealth(-MaxHealth* Time.deltaTime /10);
         }
     }
-
     public void ChangeHunger(float number)
     {
         hunger += number;

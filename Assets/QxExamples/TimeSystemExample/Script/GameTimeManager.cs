@@ -28,7 +28,7 @@ public class GameTimeManager : LogicModuleBase, IGameTimeManager
 
     public bool IsStop => !_playing;
 
-    private float _timeSize = 1;//现实世界中_timeSize秒过游戏内1分钟
+    private float _timeSize = 1f;//现实世界中_timeSize秒过游戏内1分钟
     public float TimeSize { get => _timeSize; set => _timeSize = value; }
 
     public override void Init()
