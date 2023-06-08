@@ -7,6 +7,7 @@ public class Building : InteractiveObj
 {
     public float buildingProgress;
     public UIBase interactUI;
+    public Dictionary<Item, int> needItems = new Dictionary<Item, int>();
     public override void Init(Object loadInstance = null)
     {
         sprite = gameObject.GetComponentInChildren<SpriteRenderer>();

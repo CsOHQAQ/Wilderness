@@ -7,18 +7,6 @@ using QxFramework.Core;
 public class MapManager:MonoBehaviour
 {
     private bool isInited = false;
-    /*
-    private Tilemap backgroundTilemap;
-    //用于上层地面的tilemap
-    private Tilemap decorationTilemap_Ground;
-    //用于记录地面上装饰（如花朵）的tilemap
-    private Tilemap decorationTilemap_Object;
-    
-    //分别对应上述tilemap的tile，需要在场景中提前设置
-    public TileBase backgroundTile;
-    public TileBase decGroundTile;
-    public TileBase decObjTile;
-    */
 
     private PlayerBase player;
     //最远刷新区域中心离玩家多远
@@ -95,9 +83,16 @@ public class MapManager:MonoBehaviour
         removeRecord.Clear();
 
         mapBlocks[playerPos2MapBlockPos()].ChectInteractiveItem(player);
+        SetPlayerTemperature();
+
         ShowBlockArea();//在Scene中显示区块的大小
     }
 
+    /// <summary>
+    /// 创建新的区块
+    /// </summary>
+    /// <param name="mapBlockPos"></param>
+    /// <param name="instantCreate"></param>
     private void CreateMapBlock(Vector2Int mapBlockPos, bool instantCreate = false)
     {
         GameObject block = ResourceManager.Instance.Instantiate("Prefabs/Grid/BackgroundGrid");
@@ -106,29 +101,9 @@ public class MapManager:MonoBehaviour
         block.transform.parent = this.transform;
         block.GetComponent<MapBlock>().leftDownPosition = mapBlockPos;
         mapBlocks.Add(mapBlockPos, block.GetComponent<MapBlock>());
-        /*
-        for(int x=mapBlockPos.x; x < mapBlockPos.x + blockSize * 2; x++)
-        {
-            for(int y = mapBlockPos.y; y < mapBlockPos.y + blockSize * 2; y++)
-            {
-                backgroundTilemap.SetTile(new Vector3Int(x, y, 0), backgroundTile);//先设置这一区块所有的底层tile
-            }
-        }
-        */
-        /*
-        for (int i = 0; i < blockSize * 2; i++)
-        {
-            for(int j = 0; j < blockSize * 2; j++)
-            {
-                if (decMap[i][j] ==1)
-                {
-                    decorationTilemap_Ground.SetTile(new Vector3Int(mapBlockPos.x+j,mapBlockPos.y+i,0),decGroundTile);
-                }
-            }
-        }
-        */
         block.GetComponent<MapBlock>().Init(instantCreate);
     }
+
 
     private void Interact(PlayerBase player)
     {
@@ -136,7 +111,9 @@ public class MapManager:MonoBehaviour
         curBlock.Interact(player);
     }
 
-
+    /// <summary>
+    /// 用于在debug时展现一个区块的范围
+    /// </summary>
     private void ShowBlockArea()
     {
         foreach (var block in mapBlocks.Values)
@@ -163,6 +140,12 @@ public class MapManager:MonoBehaviour
         }
     }
     
+    private void SetPlayerTemperature()
+    {
+        Vector2Int playerPos = playerMapPos();
+        player.environmentTemp = mapBlocks[playerPos2MapBlockPos()].environmentTemperature[playerPos.y,playerPos.x];
+    }
+
     private Vector2Int playerMapPos()
     { 
         int x=0,y=0;

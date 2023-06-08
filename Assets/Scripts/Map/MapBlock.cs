@@ -22,7 +22,7 @@ public class MapBlock:MonoBehaviour
    //blockSize表示区块长的一半
     public int blockSize = 20;
 
-    private float[,] environmentTemperature;
+    public float[,] environmentTemperature;
     private List<InteractiveObj> intObjList=new List<InteractiveObj>();
 
     //用于上层地面的tilemap
@@ -68,17 +68,29 @@ public class MapBlock:MonoBehaviour
 
         }
         environmentTemperature = new float[blockSize * 2,blockSize * 2];
+        for(int i = 0; i < blockSize * 2; i++)
+        {
+            for (int j = 0; j < blockSize * 2; j++)
+                environmentTemperature[i, j] = 0.5f;
+        }
     }
-
+    /// <summary>
+    /// 区块进入刷新队列
+    /// </summary>
+    /// <param name="Current"></param>
     public void EnterRefresh(GameDateTime Current)
     {
 
         lastVisitTime = Current;
     }
 
+    /// <summary>
+    /// 区块刷新
+    /// </summary>
+    /// <param name="Current"></param>
     public void Refresh(GameDateTime Current)
     {
-        
+        //检测是否有空的交互物体
         List<InteractiveObj> removeList = new List<InteractiveObj>();
         foreach (var obj in intObjList)
         {
@@ -92,11 +104,14 @@ public class MapBlock:MonoBehaviour
             intObjList.Remove(obj);
         }
 
+        //刷新所有的交互物体
         foreach (var obj in intObjList)
         {
             obj.Refresh(Current);
         }
         lastVisitTime = Current;
+
+        //如果太久未生成可交互物体，就生成一批
         if (intObjList.Count < intObjNumLimit && (Current-lastSummonTime).TotalMinutes/60>24)
         {
             SummonInterativeObj();
@@ -104,6 +119,9 @@ public class MapBlock:MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 区块退出刷新队列
+    /// </summary>
     public void ExitRefresh()
     {
 
@@ -208,6 +226,9 @@ public class MapBlock:MonoBehaviour
         return randMap;
     }
 
+    /// <summary>
+    /// 在场上生成可交互物体
+    /// </summary>
     private void SummonInterativeObj()
     {
         Randomer rand = new Randomer();
@@ -257,6 +278,10 @@ public class MapBlock:MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 检测player周围是否有可交互物体
+    /// </summary>
+    /// <param name="player"></param>
     public void ChectInteractiveItem(PlayerBase player)
     {
         //从这里开始做进入交互范围的提示，把果树做出来，再把建筑物整出来，如果不行的话就不做建筑物
@@ -294,6 +319,10 @@ public class MapBlock:MonoBehaviour
         
     }
 
+    /// <summary>
+    /// 玩家执行交互
+    /// </summary>
+    /// <param name="player"></param>
     public void Interact(PlayerBase player)
     {
         

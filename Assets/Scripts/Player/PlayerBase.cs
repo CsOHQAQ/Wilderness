@@ -17,6 +17,7 @@ public class PlayerBase: MonoBehaviour
     private Action<PlayerBase> interactFunc;
     private PlayerStateUI stateUI;
     private BackPackUI backPackUI;
+
     public void Init(bool load=false)
     {
         body = GetComponent<Rigidbody2D>();
@@ -32,17 +33,28 @@ public class PlayerBase: MonoBehaviour
         stateUI = UIManager.Instance.Open("PlayerStateUI",2,"",this).GetComponent<PlayerStateUI>();
         backPackUI = UIManager.Instance.Open("BackPackUI",2,"",new CargoData[] { data.backpack } ).GetComponent<BackPackUI>();
     }
+
+    /// <summary>
+    /// 供外部调用的交互
+    /// </summary>
+    /// <param name="action"></param>
     public void SetInteractFunc(Action<PlayerBase> action)
     {
         interactFunc = action;
     }
+
+
     private void Update()
     {
         Move();
         Interact();
         data.RefreshData(environmentTemp);
     }
-
+    private void OnDestroy()
+    {
+        UIManager.Instance.Close(stateUI);
+        UIManager.Instance.Close(backPackUI);
+    }
     public void Move()
     {
         bool isMoveX = false;

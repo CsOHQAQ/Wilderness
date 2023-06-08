@@ -14,12 +14,15 @@ public class GameProcedure : ProcedureBase {
 
         PlayerBase player = ResourceManager.Instance.Instantiate("Prefabs/Player/Player").GetComponent<PlayerBase>();
         player.Init();
+
         UIManager.Instance.Open("CreateMapHintUI");
         mapManager = GameObject.Find("MapManager").GetComponent<MapManager>();
         mapManager.Init(player);
         UIManager.Instance.Close("CreateMapHintUI");
+
         globalLight = ResourceManager.Instance.Instantiate("Prefabs/GlobalLight").GetComponent<GlobalLightControl>();
         globalLight.Init();
+
         cam = Camera.main.GetComponent<CameraController>();
         cam.Init(player);
         cam.needFollow = true;
