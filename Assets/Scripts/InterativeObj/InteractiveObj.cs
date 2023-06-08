@@ -17,4 +17,7 @@ public abstract class InteractiveObj:MonoBehaviour
     /// </summary>
     public abstract void Refresh(GameDateTime current);
     public abstract void OnDestory();
+    public abstract void EnterInteractRange();
+    public abstract void LeaveInteractRange();
+
 }

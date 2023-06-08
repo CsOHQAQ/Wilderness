@@ -94,6 +94,7 @@ public class MapManager:MonoBehaviour
         }
         removeRecord.Clear();
 
+        mapBlocks[playerPos2MapBlockPos()].ChectInteractiveItem(player);
         ShowBlockArea();//在Scene中显示区块的大小
     }
 

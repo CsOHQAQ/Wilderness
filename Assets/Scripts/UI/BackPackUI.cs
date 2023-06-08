@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class BackPackUI : PackBase
 {
-    private int curSelect=0;
+    private int curItemPile=-1;
     private float itemSize = 65;
     private Image selectImg;
     
@@ -18,25 +18,40 @@ public class BackPackUI : PackBase
     }
     private void Update()
     {
-        while (curSelect >= cargo[0].itemPiles.Count || cargo[0].itemPiles[curSelect] == null)
+        while ((curItemPile>-1)&&(curItemPile >= cargo[0].itemPiles.Count || cargo[0].itemPiles[curItemPile] == null))
         {
-            if (curSelect == 0)
+            if (curItemPile == -1)
                 break;
-            curSelect--;
+            if (cargo[0].itemPiles.Count > 0)
+            {
+                curItemPile = cargo[0].itemPiles.Count - 1;
+            }
+            else
+            {
+                curItemPile = -1;
+            }
         }
         if (InputManager.Instance.GetButtonDown(InputEnum.Switch))
         {
-            if (curSelect >= cargo[0].itemPiles.Count-1)
+            if (cargo[0].itemPiles.Count <= 0)
             {
-                Debug.Log("#Player背包指向0");
-                curSelect = 0;
+                curItemPile = -1;                
             }
-                
             else
             {
-                Debug.Log($"#Player背包指向{curSelect}");
-                curSelect++;
+                if (curItemPile >= cargo[0].itemPiles.Count - 1)
+                {
+                    Debug.Log("#Player背包指向0");
+                    curItemPile = 0;
+                }
+
+                else
+                {
+                    Debug.Log($"#Player背包指向{curItemPile}");
+                    curItemPile++;
+                }
             }
+            
         }
 
         selectImg.rectTransform.localPosition = seleceImgPos();
@@ -46,8 +61,15 @@ public class BackPackUI : PackBase
     private Vector2 seleceImgPos()
     {
         float interval = itemSize + Get<HorizontalLayoutGroup>("ItemList").spacing;
-
-        Vector2 pos = new Vector2((-(cargo[0].MaxBattery-1)/2+curSelect)*interval,interval);
+        Vector2 pos = new Vector2();
+        if (curItemPile == -1)
+        {
+            pos = new Vector2((-(cargo[0].MaxBattery - 1) / 2 ) * interval, interval);
+        }
+        else
+        {
+            pos = new Vector2((-(cargo[0].MaxBattery - 1) / 2 + cargo[0].itemPiles[curItemPile].CurrentPosID) * interval, interval);
+        }
 
         return pos;
     }

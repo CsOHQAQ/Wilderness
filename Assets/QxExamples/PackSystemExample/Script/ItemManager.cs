@@ -3,17 +3,13 @@ using UnityEngine;
 
 public class ItemManager : LogicModuleBase,IItemManager
 {
-    public ItemData _itemData;
     public Dictionary<int, Item> Items = new Dictionary<int, Item>();
     static public Dictionary<string, int> ItemsID = new Dictionary<string, int>();
     public override void Init()
     {
         base.Init();
         InitItemStatus();
-        if (!RegisterData(out _itemData))
-        {
-            InitItemData();
-        }
+        InitItemData();
     }
     private void InitItemStatus()
     {
@@ -36,13 +32,7 @@ public class ItemManager : LogicModuleBase,IItemManager
     }
     private void InitItemData()
     {
-        if (_itemData == null)
-        {
-            _itemData = new ItemData();
-        }
-
         RefeshBattery();
-
     }
 
     //初始化仓库
@@ -73,7 +63,6 @@ public class ItemManager : LogicModuleBase,IItemManager
         return -1;
     }
 
-    //玩家：_itemData.PlayerCargo
     public bool AddItem(int Id, int Count, CargoData cargo)
     {
         while (Count > 0)
@@ -157,50 +146,9 @@ public class ItemManager : LogicModuleBase,IItemManager
         RefreshAllCargoUI();
         return true;
     }
-    public bool RemoveItemByID(int ItemID, int Count)
-    {
-        CargoData[] cargo = new CargoData[] { GameMgr.Get<IItemManager>().GetPlayerItemData().PlayerCargo};
-        while (Count > 0)
-        {
-            Count--;
-            for (int j = 0; j < cargo.Length; j++)
-            {
-                for (int i = 0; i < cargo[j].itemPiles.Count; i++)
-                {
-                    if (cargo[j].itemPiles[i].item.ItemID == ItemID && cargo[j].itemPiles[i].CurrentPile > 0)
-                    {
-                        cargo[j].itemPiles[i].CurrentPile -= 1;
-                        if (cargo[j].itemPiles[i].CurrentPile <= 0)
-                        {
-                            cargo[j].itemPiles.RemoveAt(i);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        RefreshAllCargoUI();
-        return true;
-    }
     public bool CheckItemEnough(int ItemID, int Count, CargoData[] cargo)
     {
         int CountTemp = 0;
-        for (int j = 0; j < cargo.Length; j++)
-        {
-            for (int i = 0; i < cargo[j].itemPiles.Count; i++)
-            {
-                if (cargo[j].itemPiles[i].item.ItemID == ItemID)
-                {
-                    CountTemp += cargo[j].itemPiles[i].CurrentPile;
-                }
-            }
-        }
-        return CountTemp >= Count;
-    }
-    public bool CheckItemEnough(int ItemID, int Count)
-    {
-        int CountTemp = 0;
-        CargoData[] cargo = new CargoData[] { GameMgr.Get<IItemManager>().GetPlayerItemData().PlayerCargo};
         for (int j = 0; j < cargo.Length; j++)
         {
             for (int i = 0; i < cargo[j].itemPiles.Count; i++)
@@ -228,11 +176,6 @@ public class ItemManager : LogicModuleBase,IItemManager
         }
         return CountTemp;
     }
-    public int GetItemCount(int ItemID)
-    {
-        CargoData[] cargos = new CargoData[] { GameMgr.Get<IItemManager>().GetPlayerItemData().PlayerCargo};
-        return GetItemCount(ItemID, cargos);
-    }
     public bool CheckEmptyPile(CargoData[] cargo, out CargoData emptyCargo)
     {
         emptyCargo = null;
@@ -246,18 +189,7 @@ public class ItemManager : LogicModuleBase,IItemManager
         }
         return false;
     }
-    public bool CheckRemoveItemToCargo(int itmID, CargoData cargo, CargoData cargoTo)
-    {
-        if (cargo.IsShop)
-        {
-            return CheckPriceEnough(GetItemStatus(itmID).ItemPrice);
-        }
-        if (cargoTo.IsShop)
-        {
-            return CheckPriceEnough(-GetItemStatus(itmID).ItemPrice);
-        }
-        return true;
-    }
+
     public bool RemoveItemToCargo(int PosID, int Count, CargoData cargo, CargoData cargoTo)
     {
         while (Count > 0)
@@ -271,10 +203,7 @@ public class ItemManager : LogicModuleBase,IItemManager
                     Id = cargo.itemPiles[i].item.ItemID;
                 }
             }
-            if (!CheckRemoveItemToCargo(Id, cargo, cargoTo))
-            {
-                return false;
-            }
+
             if (AddItem(Id, 1, cargoTo))
             {
                 RemoveItem(PosID, 1, new CargoData[] { cargo });
@@ -338,41 +267,10 @@ public class ItemManager : LogicModuleBase,IItemManager
         putAllItemTo(new CargoData[] { cargo, TempCargo });
     }
 
-    public bool CheckCanSwitch(CargoData cargoFrom, ItemPile fromPile, CargoData cargoTo, ItemPile toPile)
-    {
-        if (cargoFrom.IsShop && cargoFrom != cargoTo)
-        {
-            if(fromPile.item.ItemID == toPile.item.ItemID)
-            {
-                return CheckPriceEnough(Mathf.Min((toPile.item.MaxPile - toPile.CurrentPile), fromPile.CurrentPile) * fromPile.item.ItemPrice);
-            }
-            return CheckPriceEnough(fromPile.item.ItemPrice * fromPile.CurrentPile - toPile.item.ItemPrice * toPile.CurrentPile);
-        }
-        if (cargoTo.IsShop && cargoFrom != cargoTo)
-        {
-            if (fromPile.item.ItemID == toPile.item.ItemID)
-            {
-                return CheckPriceEnough(-Mathf.Min((toPile.item.MaxPile - toPile.CurrentPile), fromPile.CurrentPile) * fromPile.item.ItemPrice);
-            }
-            return CheckPriceEnough(toPile.item.ItemPrice * toPile.CurrentPile - fromPile.item.ItemPrice * fromPile.CurrentPile);
-        }
-        return true;
-    }
-    bool CheckPriceEnough(int Price)
-    {
-        if(_itemData.PlayerMoney >= Price)
-        {
-            _itemData.PlayerMoney -= Price;
-            return true;
-        }
-        return false;
-    }
+
+
     public void SwitchPile(CargoData cargoFrom, ItemPile fromPile, CargoData cargoTo, ItemPile toPile)
     {
-        if (!CheckCanSwitch(cargoFrom, fromPile, cargoTo, toPile))
-        {
-            return;
-        }
         if (fromPile.item.ItemID == toPile.item.ItemID)
         {
             if(toPile.CurrentPile < toPile.item.MaxPile)
@@ -449,24 +347,8 @@ public class ItemManager : LogicModuleBase,IItemManager
             item = itmFrom
         });
     }
-    public bool CheckCanSwitch(CargoData cargoFrom, ItemPile fromPile, CargoData cargoTo)
-    {
-        if (cargoFrom.IsShop && cargoFrom != cargoTo)
-        {
-            return CheckPriceEnough(fromPile.item.ItemPrice * fromPile.CurrentPile);
-        }
-        if (cargoTo.IsShop && cargoFrom != cargoTo)
-        {
-            return CheckPriceEnough(-fromPile.item.ItemPrice * fromPile.CurrentPile);
-        }
-        return true;
-    }
     public void SwitchPile(CargoData cargoFrom, ItemPile fromPile, CargoData cargoTo, int toPosID)
     {
-        if (!CheckCanSwitch(cargoFrom, fromPile, cargoTo))
-        {
-            return;
-        }
         for (int i = 0; i < cargoFrom.itemPiles.Count; i++)
         {
             if (cargoFrom.itemPiles[i].CurrentPosID == fromPile.CurrentPosID)
@@ -489,10 +371,6 @@ public class ItemManager : LogicModuleBase,IItemManager
         }
         return Items[Id];
     }
-    public ItemData GetPlayerItemData()
-    {
-        return _itemData;
-    }
     public void RefreshAllCargoUI()
     {
         PackBase[] packUIs= GameObject.FindObjectsOfType<PackBase>();
@@ -501,13 +379,6 @@ public class ItemManager : LogicModuleBase,IItemManager
             packUIs[i].RefreshUI();
         }
     }
-}
-public class ItemData : GameDataBase
-{
-    public int PlayerMoney = 0;
-    public CargoData PlayerCargo = new CargoData();
-    public CargoData GroundCargo = new CargoData();
-    public CargoData ShopCargo = new CargoData();
 }
 public class CargoData 
 {

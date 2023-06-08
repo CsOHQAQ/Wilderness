@@ -14,9 +14,6 @@ public class MapBlock:MonoBehaviour
     public int ID;
 
     [HideInInspector]
-    public Dictionary<Vector2Int,SingleMapBlock> singleBlocks=new Dictionary<Vector2Int, SingleMapBlock>();
-
-    [HideInInspector]
     public GameDateTime lastVisitTime=new GameDateTime();
     private GameDateTime lastSummonTime = new GameDateTime();
     private int intObjNumLimit = 12;
@@ -25,9 +22,9 @@ public class MapBlock:MonoBehaviour
    //blockSize表示区块长的一半
     public int blockSize = 20;
 
+    private float[,] environmentTemperature;
     private List<InteractiveObj> intObjList=new List<InteractiveObj>();
 
-    private Tilemap backgroundTilemap;
     //用于上层地面的tilemap
     private Tilemap decorationTilemap_Ground;
     //用于记录地面上装饰（如花朵）的tilemap
@@ -38,6 +35,8 @@ public class MapBlock:MonoBehaviour
     public TileBase decGroundTile;
     public TileBase decObjTile;
 
+    public InteractiveObj curInteractableObj = null;
+
     /// <summary>
     /// 仅在被创建时调用的初始化罢大概
     /// </summary>
@@ -47,7 +46,6 @@ public class MapBlock:MonoBehaviour
         lastVisitTime = GameMgr.Get<IGameTimeManager>().GetNow();
         lastSummonTime = lastVisitTime;
         SummonInterativeObj();
-        backgroundTilemap = this.transform.Find("Background").GetComponent<Tilemap>();
         decorationTilemap_Ground = this.transform.Find("Decoration_Ground").GetComponent<Tilemap>();
         decorationTilemap_Object = this.transform.Find("Decoration_Obj").GetComponent<Tilemap>();
 
@@ -69,7 +67,7 @@ public class MapBlock:MonoBehaviour
             }
 
         }
-        
+        environmentTemperature = new float[blockSize * 2,blockSize * 2];
     }
 
     public void EnterRefresh(GameDateTime Current)
@@ -219,9 +217,10 @@ public class MapBlock:MonoBehaviour
         int objItemNum=3;//这个是一个资源点会有几个资源的基数
         float objPointRange = 5f;
         float objPointInterval = 15f;
+
         for(int pointId = 1; pointId <= objPointNum; pointId++)
         {
-            Vector2 pointPos = new Vector2(rand.nextFloat()*blockSize*2+leftDownPosition.x, rand.nextFloat() * blockSize * 2 + leftDownPosition.y);
+            Vector2 pointPos = new Vector2(rand.nextFloat() * (blockSize * 2 - 2 * objPointRange) + objPointRange + leftDownPosition.x, rand.nextFloat() * (blockSize * 2 - 2 * objPointRange) + objPointRange + leftDownPosition.y);
             bool flag = true;
             int runTimes = 0;
             while (flag && runTimes < 20)
@@ -244,9 +243,10 @@ public class MapBlock:MonoBehaviour
                 Debug.LogError($"#Map区块{leftDownPosition}未能在满足间隔的情况下生成随机物体");
             objItemNum = (int)Mathf.Abs( rand.nextNormal(objItemNum,0.5f)) + 1;
             Debug.Log($"#Map资源点内有{objItemNum}个");
+
             for (int itemId = 1; itemId <= objItemNum; itemId++)
             {
-                float range = rand.nextNormal(objPointRange),angle=rand.nextFloat()*2*Mathf.PI;//生成随机半径和角度
+                float range = rand.nextFloat()* objPointRange, angle=rand.nextFloat()*2*Mathf.PI;//生成随机半径和角度
                 InteractiveObj intObj = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Plant/WoodTree").GetComponent<InteractiveObj>();
                 intObj.transform.SetParent(this.transform);
                 intObj.Init();
@@ -257,15 +257,52 @@ public class MapBlock:MonoBehaviour
         }
     }
 
+    public void ChectInteractiveItem(PlayerBase player)
+    {
+        //从这里开始做进入交互范围的提示，把果树做出来，再把建筑物整出来，如果不行的话就不做建筑物
+        InteractiveObj obj = null;
+        float minDis = 114514f;
+        foreach (var intObj in intObjList)
+        {
+            float dis = Vector2.Distance(intObj.transform.position, player.transform.position);
+            if (dis < minDis && dis <= player.interactRange)
+            {
+                obj = intObj;
+                minDis = dis;
+            }
+        }
+        if (obj != null)
+        {
+            Debug.Log($"#Map最近交互物{obj.transform.position},距离{minDis}");
+        }
+        if (obj == null)
+        {
+            if (curInteractableObj != null)
+            {
+                curInteractableObj.LeaveInteractRange();
+            }
+            curInteractableObj = null;
+            return;
+        }
+        if (obj != null&&curInteractableObj!=obj)
+        {
+            if(curInteractableObj!=null)
+                curInteractableObj.LeaveInteractRange();
+            obj.EnterInteractRange();
+            curInteractableObj = obj;
+        }
+        
+    }
+
     public void Interact(PlayerBase player)
     {
-        float interactRange = 2f;
+        
         InteractiveObj obj=null;
         float minDistance = 1000000f;
         foreach(var intObj in intObjList)
         {
             float distance = Vector2.Distance(intObj.transform.position, player.transform.position);
-            if (distance<interactRange&&distance<minDistance)
+            if (distance<player.interactRange&&distance<minDistance)
             {
                 obj = intObj;
                 minDistance = distance;
@@ -276,9 +313,4 @@ public class MapBlock:MonoBehaviour
             obj.Interact(player); 
         }
     }
-}
-
-public class SingleMapBlock
-{
-    public Sprite sprite;
 }

@@ -95,10 +95,6 @@ public class PackBase : UIBase
     }
     private void Update()
     {
-        if (Find("MoneyText") != null)
-        {
-            Get<Text>("MoneyText").text = "信用点：" + GameMgr.Get<IItemManager>().GetPlayerItemData().PlayerMoney;
-        }
     }
     private void OnDisable()
     {

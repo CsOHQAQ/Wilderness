@@ -10,6 +10,8 @@ public class PlayerBase: MonoBehaviour
     [HideInInspector]
     public Rigidbody2D body;
     public bool canMove = true;
+    [HideInInspector]
+    public float interactRange = 2f;
     public float environmentTemp = 100f;
 
     private Action<PlayerBase> interactFunc;
