@@ -10,9 +10,9 @@ public class WoodTree : RenewableObj
     private float maxGrowPercentage = 1;
     private float growHour = 24;//从0生长到maxGrowPercentage所需的时间
     private int woodNum =0;
-    public override void Init(Object loadInstance = null)
+    public override void Init(MapBlock block, Object loadInstance = null)
     {
-        base.Init(loadInstance);
+        base.Init(block, loadInstance);
         if (loadInstance != null && loadInstance is WoodTree)
         {
             //在此写读取存档的内容

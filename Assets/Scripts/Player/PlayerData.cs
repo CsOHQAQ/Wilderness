@@ -5,7 +5,7 @@ using QxFramework.Core;
 public class PlayerData
 {
     protected string tableIndex = "player";
-    [Tooltip("生命值")]
+    [Tooltip("最大生命值")]
     private float maxHealth;
     private float health;
     public float MaxHealth
@@ -22,7 +22,7 @@ public class PlayerData
             return health;
         }
     }
-    [Tooltip("饱腹值")]
+    [Tooltip("最大饱腹值")]
     private float maxHunger;
     private float hunger;
     public float MaxHunger
@@ -39,7 +39,7 @@ public class PlayerData
             return hunger;
         }
     }
-    [Tooltip("温度,以100为满，0为最冷")]
+    [Tooltip("最大温度,以100为满，0为最冷")]
     private float maxTemperature;
     private float temperature;
     public float MaxTemperature
@@ -57,7 +57,7 @@ public class PlayerData
         }
     }
 
-    [Tooltip("移速")]
+    [Tooltip("最大移速")]
     private float velocity;
     public float Velocity
     {
@@ -72,7 +72,7 @@ public class PlayerData
     //private 
     [Tooltip("位置,此为用于存读档的位置记录,所以修改它是不能修改玩家位置的")]
     public Vector2 Position;
-
+    
     public CargoData backpack;
 
     public void Init(PlayerData saveData=null)

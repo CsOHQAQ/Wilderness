@@ -5,12 +5,17 @@ using UnityEngine;
 
 public class Building : InteractiveObj
 {
-    public float buildingProgress;
-    public UIBase interactUI;
+    public string buildingName = "";
     public Dictionary<Item, int> needItems = new Dictionary<Item, int>();
-    public override void Init(Object loadInstance = null)
+    public GameDateTime needTime = new GameDateTime();
+
+    public UIBase interactUI;
+    public float buildingProgress;
+
+    public override void Init(MapBlock block, Object loadInstance = null)
     {
-        sprite = gameObject.GetComponentInChildren<SpriteRenderer>();
+        mapBlock = block;
+        sprite = gameObject.GetComponentInChildren<SpriteRenderer>();        
     }
     public override void Interact(PlayerBase player)
     {

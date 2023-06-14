@@ -55,6 +55,9 @@ public class PlayerBase: MonoBehaviour
         UIManager.Instance.Close(stateUI);
         UIManager.Instance.Close(backPackUI);
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public void Move()
     {
         bool isMoveX = false;

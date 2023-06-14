@@ -8,8 +8,9 @@ public class RenewableObj : InteractiveObj
      public GameDateTime lastVisitTime;
     UIBase interactUI;
 
-    public override void Init(Object loadInstance=null)
+    public override void Init(MapBlock block , Object loadInstance=null)
     {
+        block = mapBlock;
         sprite = gameObject.GetComponentInChildren<SpriteRenderer>();
     }
     public override void Interact(PlayerBase player)

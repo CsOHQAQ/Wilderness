@@ -7,23 +7,26 @@ using System;
 
 public class MapBlock:MonoBehaviour
 {
+    //左下角的位置
     [HideInInspector]
     public Vector2Int leftDownPosition=new Vector2Int();
 
+    //该区块在MapManager的mapBlocks中的位置
     [HideInInspector]
     public int ID;
 
     [HideInInspector]
-    public GameDateTime lastVisitTime=new GameDateTime();
-    private GameDateTime lastSummonTime = new GameDateTime();
-    private int intObjNumLimit = 12;
+    public GameDateTime lastVisitTime=new GameDateTime();//最后访问时间
+    private GameDateTime lastSummonTime = new GameDateTime();//最后刷新可交互物体时间
+    private int intObjNumLimit = 12;//区块中可交互物体的上限
 
     [HideInInspector]
    //blockSize表示区块长的一半
     public int blockSize = 20;
 
-    public float[,] environmentTemperature;
-    private List<InteractiveObj> intObjList=new List<InteractiveObj>();
+    public float[,] environmentTemperature;//该区块的环境温度
+
+    private List<InteractiveObj> intObjList=new List<InteractiveObj>();//区块中所有的可交互物体
 
     //用于上层地面的tilemap
     private Tilemap decorationTilemap_Ground;
@@ -35,7 +38,7 @@ public class MapBlock:MonoBehaviour
     public TileBase decGroundTile;
     public TileBase decObjTile;
 
-    public InteractiveObj curInteractableObj = null;
+    public InteractiveObj curInteractableObj = null;//当前玩家可以交互的物体
 
     /// <summary>
     /// 仅在被创建时调用的初始化罢大概
@@ -236,10 +239,10 @@ public class MapBlock:MonoBehaviour
         int objPointNum = (int)Mathf.Abs( rand.nextNormal(2,0.4f));
         Debug.Log($"#Map生成资源点{objPointNum}个");
         int objItemNum=3;//这个是一个资源点会有几个资源的基数
-        float objPointRange = 5f;
-        float objPointInterval = 15f;
-
-        for(int pointId = 1; pointId <= objPointNum; pointId++)
+        float objPointRange = 5f;//一个资源点内所有可交互物体离中心最远距离
+        float objPointInterval = 15f;//资源点之间的最小间距
+        #region 生成资源点的坐标
+        for (int pointId = 1; pointId <= objPointNum; pointId++)
         {
             Vector2 pointPos = new Vector2(rand.nextFloat() * (blockSize * 2 - 2 * objPointRange) + objPointRange + leftDownPosition.x, rand.nextFloat() * (blockSize * 2 - 2 * objPointRange) + objPointRange + leftDownPosition.y);
             bool flag = true;
@@ -264,17 +267,19 @@ public class MapBlock:MonoBehaviour
                 Debug.LogError($"#Map区块{leftDownPosition}未能在满足间隔的情况下生成随机物体");
             objItemNum = (int)Mathf.Abs( rand.nextNormal(objItemNum,0.5f)) + 1;
             Debug.Log($"#Map资源点内有{objItemNum}个");
+            #endregion
 
+            #region 在资源点周围生成可交互物体
             for (int itemId = 1; itemId <= objItemNum; itemId++)
             {
                 float range = rand.nextFloat()* objPointRange, angle=rand.nextFloat()*2*Mathf.PI;//生成随机半径和角度
                 InteractiveObj intObj = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Plant/WoodTree").GetComponent<InteractiveObj>();
                 intObj.transform.SetParent(this.transform);
-                intObj.Init();
+                intObj.Init(this);
                 intObj.transform.position = new Vector2(Mathf.Cos(angle),Mathf.Sin(angle))*range+pointPos;
                 intObjList.Add(intObj);
             }
-
+            #endregion 
         }
     }
 
