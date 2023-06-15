@@ -5,13 +5,13 @@ using QxFramework.Core;
 using UnityEngine.UI;
 public class RenewableObj : InteractiveObj
 {
-     public GameDateTime lastVisitTime;
     UIBase interactUI;
 
     public override void Init(MapBlock block , Object loadInstance=null)
     {
         block = mapBlock;
         sprite = gameObject.GetComponentInChildren<SpriteRenderer>();
+        lastVisitTime = GameMgr.Get<IGameTimeManager>().GetNow();
     }
     public override void Interact(PlayerBase player)
     {

@@ -6,15 +6,19 @@ using System;
 
 public class PlayerBase: MonoBehaviour
 {
+    //玩家所带实例
     public PlayerData data;
+    //玩家GO的刚体
     [HideInInspector]
     public Rigidbody2D body;
     public bool canMove = true;
     [HideInInspector]
     public float interactRange = 2f;
     public float environmentTemp = 100f;
+    public bool isInteracting = false;
 
     private Action<PlayerBase> interactFunc;
+    private CraftTableUI craftTable;
     private PlayerStateUI stateUI;
     private BackPackUI backPackUI;
 
@@ -46,9 +50,11 @@ public class PlayerBase: MonoBehaviour
 
     private void Update()
     {
+        CheckCraftTable();
         Move();
         Interact();
         data.RefreshData(environmentTemp);
+        
     }
     private void OnDestroy()
     {
@@ -62,25 +68,28 @@ public class PlayerBase: MonoBehaviour
     {
         bool isMoveX = false;
         bool isMoveY = false;
-        if (InputManager.Instance.GetButton(InputEnum.Up)&&(!InputManager.Instance.GetButton(InputEnum.Down)))//向上移动
+        if (!isInteracting)
         {
-            isMoveY = true;
-            body.velocity = new Vector2(body.velocity.x, data.Velocity);
-        }
-        if(InputManager.Instance.GetButton(InputEnum.Down) && (!InputManager.Instance.GetButton(InputEnum.Up)))
-        {
-            isMoveY = true;
-            body.velocity = new Vector2(body.velocity.x, -data.Velocity);
-        }
-        if (InputManager.Instance.GetButton(InputEnum.Left) && (!InputManager.Instance.GetButton(InputEnum.Right)))//向上移动
-        {
-            isMoveX = true;
-            body.velocity = new Vector2(-data.Velocity, body.velocity.y);
-        }
-        if (InputManager.Instance.GetButton(InputEnum.Right) && (!InputManager.Instance.GetButton(InputEnum.Left)))//向上移动
-        {
-            isMoveX = true;
-            body.velocity = new Vector2(data.Velocity, body.velocity.y);
+            if (InputManager.Instance.GetButton(InputEnum.Up) && (!InputManager.Instance.GetButton(InputEnum.Down)))//向上移动
+            {
+                isMoveY = true;
+                body.velocity = new Vector2(body.velocity.x, data.Velocity);
+            }
+            if (InputManager.Instance.GetButton(InputEnum.Down) && (!InputManager.Instance.GetButton(InputEnum.Up)))
+            {
+                isMoveY = true;
+                body.velocity = new Vector2(body.velocity.x, -data.Velocity);
+            }
+            if (InputManager.Instance.GetButton(InputEnum.Left) && (!InputManager.Instance.GetButton(InputEnum.Right)))//向上移动
+            {
+                isMoveX = true;
+                body.velocity = new Vector2(-data.Velocity, body.velocity.y);
+            }
+            if (InputManager.Instance.GetButton(InputEnum.Right) && (!InputManager.Instance.GetButton(InputEnum.Left)))//向上移动
+            {
+                isMoveX = true;
+                body.velocity = new Vector2(data.Velocity, body.velocity.y);
+            }
         }
         if (!isMoveX)
         {
@@ -91,12 +100,28 @@ public class PlayerBase: MonoBehaviour
             body.velocity = new Vector2(body.velocity.x ,Mathf.Max(0, body.velocity.y - data.Velocity / 5));
         }
     }
-
+    /// <summary>
+    /// 检查玩家是否按下交互键
+    /// </summary>
     public void Interact()
     {
-        if (InputManager.Instance.GetButtonDown(InputEnum.Interact))
+        if (InputManager.Instance.GetButtonDown(InputEnum.Interact)&&!isInteracting)
         {
             interactFunc.Invoke(this);
         }
     }
+
+    /// <summary>
+    /// 检查玩家是否按下合成键
+    /// </summary>
+    public void CheckCraftTable()
+    {
+        if (InputManager.Instance.GetButtonDown(InputEnum.Craft)&&!isInteracting)
+        {
+            isInteracting = true;
+            craftTable= UIManager.Instance.Open("CraftTableUI",2,"CraftTableUI",this).GetComponent<CraftTableUI>();
+        }
+    }
+
+
 }

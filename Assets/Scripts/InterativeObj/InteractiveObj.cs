@@ -6,6 +6,7 @@ public abstract class InteractiveObj:MonoBehaviour
 {
     protected private SpriteRenderer sprite;
     protected private MapBlock mapBlock;//所在区块
+    public GameDateTime lastVisitTime;
     /// <summary>
     /// 每次被生成的时候的初始化
     /// </summary>

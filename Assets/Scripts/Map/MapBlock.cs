@@ -275,12 +275,21 @@ public class MapBlock:MonoBehaviour
                 float range = rand.nextFloat()* objPointRange, angle=rand.nextFloat()*2*Mathf.PI;//生成随机半径和角度
                 InteractiveObj intObj = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Plant/WoodTree").GetComponent<InteractiveObj>();
                 intObj.transform.SetParent(this.transform);
-                intObj.Init(this);
-                intObj.transform.position = new Vector2(Mathf.Cos(angle),Mathf.Sin(angle))*range+pointPos;
+                intObj.transform.position = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * range + pointPos;
+                intObj.Init(this);                
                 intObjList.Add(intObj);
             }
             #endregion 
         }
+    }
+
+    /// <summary>
+    /// 在区块中开始建造建筑
+    /// </summary>
+    /// <param name="buildingName">生成建筑的名字</param>
+    private void StartBuilding(string buildingName)
+    {
+
     }
 
     /// <summary>
@@ -303,7 +312,7 @@ public class MapBlock:MonoBehaviour
         }
         if (obj != null)
         {
-            Debug.Log($"#Map最近交互物{obj.transform.position},距离{minDis}");
+            //Debug.Log($"#Map最近交互物{obj.transform.position},距离{minDis}");
         }
         if (obj == null)
         {

@@ -11,7 +11,6 @@ public class BackPackUI : PackBase
     public override void OnDisplay(object args)
     {
         base.OnDisplay(args);
-        Debug.Log($"#Test 测试{Get<RectTransform>("Panel")}" ); 
         Get<RectTransform>("Panel").sizeDelta=new Vector2(  cargo[0].MaxBattery * (itemSize + Get<HorizontalLayoutGroup>("ItemList").spacing) + Get<HorizontalLayoutGroup>("ItemList").spacing,itemSize+2* Get<HorizontalLayoutGroup>("ItemList").spacing);
         selectImg = Get<Image>("SelectImg");
         selectImg.rectTransform.localPosition = seleceImgPos();
@@ -73,5 +72,8 @@ public class BackPackUI : PackBase
 
         return pos;
     }
-
+    public ItemPile GetCurrentItem()
+    {
+        return cargo[0].itemPiles[curItemPile];
+    }
 }

@@ -17,8 +17,9 @@ public class InputManager : Singleton<InputManager>, ISystemModule
         { InputEnum.Interact, new Tuple<KeyCode, XboxButton>(KeyCode.Space, XboxButton.Y) },
         {InputEnum.Switch,new Tuple<KeyCode, XboxButton>(KeyCode.Q,XboxButton.Right) },
         { InputEnum.Menu, new Tuple<KeyCode, XboxButton>(KeyCode.Escape, XboxButton.Menu) },
-        { InputEnum.Bag, new Tuple<KeyCode, XboxButton>(KeyCode.E, XboxButton.Menu) },
+        { InputEnum.UseItem, new Tuple<KeyCode, XboxButton>(KeyCode.E, XboxButton.Menu) },
         { InputEnum.Quit, new Tuple<KeyCode, XboxButton>(KeyCode.Escape, XboxButton.Start) },
+        { InputEnum.Craft, new Tuple<KeyCode, XboxButton>(KeyCode.C, XboxButton.Start) },
     };
 
     private Dictionary<InputEnum, Tuple<KeyCode, XboxButton>> buttonConfig;
@@ -165,8 +166,9 @@ public enum InputEnum
     Heal,
     Switch,
     Menu,
-    Bag,
+    UseItem,
     Quit,
+    Craft,
 }
 
 

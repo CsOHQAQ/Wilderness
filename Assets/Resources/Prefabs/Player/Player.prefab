@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6327268309522768121}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,6 +95,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   body: {fileID: 0}
   canMove: 1
+  interactRange: 2
+  environmentTemp: 100
+  isInteracting: 0
 --- !u!1 &6327268309576966577
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,6 +25,7 @@ public class ItemManager : LogicModuleBase,IItemManager
             item.ItemCodeName = QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "CodeName");
             item.ItemDescription = QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Description");
             item.ItemType = (ItemType)System.Enum.Parse(typeof(ItemType),QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Type"));
+            item.ItemFunc= QxFramework.Core.QXData.Instance.TableAgent.GetString("Items", AllItemsStatus[i].ToString(), "Func");
             item.MaxPile = QxFramework.Core.QXData.Instance.TableAgent.GetInt("Items", AllItemsStatus[i].ToString(), "MaxPile");
             Items.Add(int.Parse(AllItemsStatus[i]), item);
             ItemsID.Add(item.ItemCodeName, item.ItemID);
@@ -409,5 +410,6 @@ public class Item
 public enum ItemType
 {
     Props,
-    Material
+    Material,
+    Building,
 }

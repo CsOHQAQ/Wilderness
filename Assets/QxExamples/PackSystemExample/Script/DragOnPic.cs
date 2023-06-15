@@ -61,6 +61,7 @@ public class DragOnPic : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
         GameObject target = eventData.pointerEnter;
         if (target.transform.parent.name.Contains("ItemUI"))
         {
+            /*
             if (target.GetComponent<DragOnPic>().itemPile != null)
             {
                 UIManager.Instance.Open("ItemBreifUI", 1, args: new string[] {
@@ -69,6 +70,7 @@ public class DragOnPic : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
                 + (UIManager.Instance.FindUI("ShopCargoUI")?"\n\n价格：" + target.GetComponent<DragOnPic>().itemPile.item.ItemPrice:"")
             });
             }
+            */
         }
     }
     public void OnPointerExit(PointerEventData eventData)

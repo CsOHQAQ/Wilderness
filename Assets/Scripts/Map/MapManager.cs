@@ -25,13 +25,16 @@ public class MapManager:MonoBehaviour
         player = playerBase;
         player.SetInteractFunc(Interact);
         //如果有存档就在这里写读取罢！
-        for(int i = -4; i <= 4; i++)
+
+        //在初始化大地图预先在玩家周围生成如下这么多个地块，防止后续卡顿
+        for(int i = -3; i <= 3; i++)
         {
-            for(int j = -4; j <= 4; j++)
+            for(int j = -3; j <= 3; j++)
             {
                 CreateMapBlock(new Vector2Int(i, j) * 2 * blockSize, true);
             }
         }
+
         Debug.Log("#Map完成地图块初始生成");
         isInited = true;//完成初始化，可以开始Update
     }
