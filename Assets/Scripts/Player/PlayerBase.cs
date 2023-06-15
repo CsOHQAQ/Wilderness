@@ -50,7 +50,7 @@ public class PlayerBase: MonoBehaviour
 
     private void Update()
     {
-        CheckCraftTable();
+        OpenCraftTable();
         Move();
         Interact();
         data.RefreshData(environmentTemp);
@@ -114,7 +114,7 @@ public class PlayerBase: MonoBehaviour
     /// <summary>
     /// 检查玩家是否按下合成键
     /// </summary>
-    public void CheckCraftTable()
+    public void OpenCraftTable()
     {
         if (InputManager.Instance.GetButtonDown(InputEnum.Craft)&&!isInteracting)
         {
@@ -122,6 +122,9 @@ public class PlayerBase: MonoBehaviour
             craftTable= UIManager.Instance.Open("CraftTableUI",2,"CraftTableUI",this).GetComponent<CraftTableUI>();
         }
     }
-
+    public void UseItem()
+    {
+        //if()
+    }
 
 }

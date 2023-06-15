@@ -1,2 +1,2 @@
 ﻿CraftTable,Name,TargetItem,Image,NeedItemList,Description
-BuildBonfire,建造篝火,bonfire,bonfire,Wood:4,使用后可以消耗一定时间建造一个篝火
+BuildBonfire,建造篝火,BonfireBuilder,bonfire,Wood:4,使用后可以消耗一定时间建造一个篝火

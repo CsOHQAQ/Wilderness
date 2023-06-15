@@ -13,7 +13,7 @@ public class CraftTableUI : UIBase
     private Button confirmBtn;
     private Button exitBtn;
     private TableAgent tab;
-    private string curSelect = "";
+    private string curSelectCraft = "";
     public override void OnDisplay(object args)
     {
         base.OnDisplay(args);
@@ -112,16 +112,16 @@ public class CraftTableUI : UIBase
         #endregion
 
         #region 设置右侧面板
-        curSelect = tableName;
-        itemImg.sprite = ResourceManager.Instance.Load<Sprite>("Texture/Property/"+tab.GetString("CraftTable",curSelect,"Image"));
-        itemName.text = tab.GetString("CraftTable", curSelect, "Name");
-        itemDes.text = tab.GetString("CraftTable", curSelect, "Description");
+        curSelectCraft = tableName;
+        itemImg.sprite = ResourceManager.Instance.Load<Sprite>("Texture/Property/"+tab.GetString("CraftTable",curSelectCraft,"Image"));
+        itemName.text = tab.GetString("CraftTable", curSelectCraft, "Name");
+        itemDes.text = tab.GetString("CraftTable", curSelectCraft, "Description");
         #endregion
 
         bool canCraft = true;
 
         #region 将合成所需材料依次显示到NeedItemList中
-        Dictionary<string, int> needItemDic = GetNeedItemList(tab.GetString("CraftTable",curSelect,"NeedItemList"));
+        Dictionary<string, int> needItemDic = GetNeedItemList(tab.GetString("CraftTable",curSelectCraft,"NeedItemList"));
         foreach (string name in needItemDic.Keys )//按照每种需求的item创建UI
         {
             //初始化
@@ -157,29 +157,29 @@ public class CraftTableUI : UIBase
     /// </summary>
     private void Craft()
     {
-        if (!tab.CollectKey1("CraftTable").Contains(curSelect))
+        if (!tab.CollectKey1("CraftTable").Contains(curSelectCraft))
         {
-            Debug.LogError($"#Craft合成表中不存在{curSelect}");
+            Debug.LogError($"#Craft合成表中不存在{curSelectCraft}");
             return;
         }
 
-        Dictionary<string, int> needItemDic = GetNeedItemList(tab.GetString("CraftTable", curSelect, "NeedItemList"));
+        Dictionary<string, int> needItemDic = GetNeedItemList(tab.GetString("CraftTable", curSelectCraft, "NeedItemList"));
         foreach (string name in needItemDic.Keys)
         {
             int itemID = ItemManager.ItemsID[name];
             GameMgr.Get<IItemManager>().RemoveItemByID(itemID,needItemDic[name],new CargoData[] { player.data.backpack});
         }//依次从玩家backpack中移除合成的各种物品
 
-        if (!GameMgr.Get<IItemManager>().AddItem(ItemManager.ItemsID[tab.GetString("CraftTable", curSelect, "TargetItem")], 1, player.data.backpack))//如果不能成功的向玩家背包添加物品，就在地面生成一个dropItem
+        if (!GameMgr.Get<IItemManager>().AddItem(ItemManager.ItemsID[tab.GetString("CraftTable", curSelectCraft, "TargetItem")], 1, player.data.backpack))//如果不能成功的向玩家背包添加物品，就在地面生成一个dropItem
         {
             ItemPile item = new ItemPile();
-            item.item = GameMgr.Get<IItemManager>().GetItemStatus(ItemManager.ItemsID[tab.GetString("CraftTable", curSelect, "TargetItem")]);
+            item.item = GameMgr.Get<IItemManager>().GetItemStatus(ItemManager.ItemsID[tab.GetString("CraftTable", curSelectCraft, "TargetItem")]);
             item.CurrentPile = 1;
             DropItem dropItem = ResourceManager.Instance.Instantiate("Prefabs/DropItem").GetComponent<DropItem>();
             dropItem.transform.position = player.transform.position + new Vector3(0, -1);
             dropItem.Init(item, player.data.backpack);
         }
-        SetCurCraft(curSelect);//通过重新选择刷新一遍ui
+        SetCurCraft(curSelectCraft);//通过重新选择刷新一遍ui
     }
 
 }

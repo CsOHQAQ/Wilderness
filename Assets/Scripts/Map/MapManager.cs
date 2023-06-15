@@ -153,7 +153,21 @@ public class MapManager:MonoBehaviour
     private void SetPlayerTemperature()
     {
         Vector2Int playerPosInBlock = playerMapPos()-playerPos2MapBlockPos();//将玩家的整数坐标转换为在区块中相对于左下角的坐标
-        player.environmentTemp = mapBlocks[playerPos2MapBlockPos()].environmentTemperature[playerPosInBlock.y, playerPosInBlock.x];
+
+        //防止数组越界，进行一次四舍五入
+        playerPosInBlock.x = Mathf.Max(0, Mathf.Min(playerPosInBlock.x, blockSize * 2 - 1));
+        playerPosInBlock.y = Mathf.Max(0, Mathf.Min(playerPosInBlock.y, blockSize * 2 - 1));
+
+        try//如果由于其他问题出错直接跳过，等下次再更新即可，并非关键问题
+        {
+            player.environmentTemp = mapBlocks[playerPos2MapBlockPos()].environmentTemperature[playerPosInBlock.y, playerPosInBlock.x];
+        }
+        catch (Exception)
+        {
+            Debug.LogError($"玩家在区块{playerPos2MapBlockPos()}中不存在位置{new Vector2( playerPosInBlock.x,playerPosInBlock.y)}");
+            throw;
+        }
+        
     }
     /// <summary>
     /// 玩家位置在区块中所在格数
