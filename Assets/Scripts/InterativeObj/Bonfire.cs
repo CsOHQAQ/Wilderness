@@ -9,7 +9,7 @@ public class Bonfire : Building
     public float remainBurnMinute = 0f;//还能燃烧的分钟数
     public bool isBurn = false;
     public HeatSpot heatSpot;
-    private float baseHeat = 80f;
+    private float baseHeat = 90f;
     private float lightIntensity = 1;
     private Light2D fireLight;
 
@@ -40,7 +40,7 @@ public class Bonfire : Building
             if (player.backPackUI.GetCurrentItem().item.ItemCodeName == "Wood")//只有玩家当前选中的道具为木头才能交互
             {
                 GameMgr.Get<IItemManager>().RemoveItem(player.backPackUI.GetCurrentItem().CurrentPosID, 1, new CargoData[] { player.data.backpack });
-                remainBurnMinute += 40f;
+                remainBurnMinute += 60f;
             }
         }
     }

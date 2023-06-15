@@ -110,10 +110,10 @@ public class PlayerData
         //deltaTime*frames=1
         float consumeHungerDay = MaxHunger*Time.deltaTime / (60*24);//分子是消耗的hunger，分母是游戏中经过的分钟
         
-        float consumeTemperatureHour = (environmentTemp-temperature) * 4 * Time.deltaTime/ 60;
+        float consumeTemperatureHour = (environmentTemp-temperature)  * Time.deltaTime/ (60*12);//分母表示分钟数
          
         ChangeHunger(-consumeHungerDay);
-        ChangeTemperature(-consumeTemperatureHour);
+        ChangeTemperature(consumeTemperatureHour);
         if (Hunger > (3 * MaxHunger / 4)&&Temperature>(3*MaxTemperature))
         {
             ChangeHealth(MaxHealth* Time.deltaTime  / (60*12));

@@ -74,7 +74,7 @@ public class MapBlock:MonoBehaviour
         for(int i = 0; i < blockSize * 2; i++)
         {
             for (int j = 0; j < blockSize * 2; j++)
-                environmentTemperature[i, j] = 0.5f;
+                environmentTemperature[i, j] = 20f;
         }
     }
     /// <summary>
@@ -347,6 +347,20 @@ public class MapBlock:MonoBehaviour
         if (curInteractableObj != null)
         {
             curInteractableObj.Interact(player); 
+        }
+    }
+
+    /// <summary>
+    /// 自然刷新环境温度
+    /// </summary>
+    public void UpdateEnvironmentTemperature()
+    {
+        for(int i = 0; i < blockSize * 2; i++)
+        {
+            for (int j = 0; j < blockSize * 2; j++)
+            {
+                environmentTemperature[i, j] = Mathf.Max(environmentTemperature[i, j] - 10 * Time.deltaTime / 60, 10f);
+            }
         }
     }
 }

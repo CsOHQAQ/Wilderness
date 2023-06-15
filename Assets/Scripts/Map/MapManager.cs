@@ -82,6 +82,7 @@ public class MapManager:MonoBehaviour
             else
             {
                 block.Refresh(GameMgr.Get<IGameTimeManager>().GetNow());//刷新区块
+                block.UpdateEnvironmentTemperature();
             }
         }
 
