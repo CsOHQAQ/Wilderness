@@ -2,15 +2,18 @@
 using UnityEngine;
 public class Titlemodule : Submodule {
     private UIBase title;
+    private bool isInited = false;
     protected override void OnInit()
     {
         base.OnInit();
-        InitGame();
+        if(!isInited)
+            InitGame();
     }
     private void InitGame()
     {
         QXData.Instance.SetTableAgent();
         GameMgr.Instance.InitModules();
+        isInited = true;
         Debug.Log(GameMgr.Get<IGameTimeManager>().GetNow().ToString());
         title= UIManager.Instance.Open("TitleUI");
     }

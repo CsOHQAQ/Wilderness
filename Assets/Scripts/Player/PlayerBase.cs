@@ -46,6 +46,7 @@ public class PlayerBase: MonoBehaviour
 
     private void Update()
     {
+        OpenExitMenu();
         OpenCraftTable();
         Move();
         Interact();
@@ -145,5 +146,13 @@ public class PlayerBase: MonoBehaviour
     {        
         buildFunc.Invoke(this,backPackUI.GetCurrentItem().item.ItemFunc);
         GameMgr.Get<IItemManager>().RemoveItem(backPackUI.GetCurrentItem().CurrentPosID, 1, new CargoData[] { data.backpack });
+    }
+
+    public void OpenExitMenu()
+    {
+        if (InputManager.Instance.GetButtonDown(InputEnum.Quit))
+        {
+            UIManager.Instance.Open("ExitMenuUI");
+        }
     }
 }

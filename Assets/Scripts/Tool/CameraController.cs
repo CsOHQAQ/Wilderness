@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using QxFramework.Core;
 
 public class CameraController : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class CameraController : MonoBehaviour
     }
     public void Update()
     {
-        if (needFollow)
+        if (ProcedureManager.Instance.Current is GameProcedure)
         {
             transform.position = player.transform.position - new Vector3(0, 0, 50);
         }

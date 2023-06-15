@@ -10,6 +10,10 @@ public class TitleUI : UIBase
     {
         base.OnDisplay(args);
         Get<Button>("StartBtn").onClick.SetListener(StartGame);
+
+        Get<Button>("ExitBtn").onClick.AddListener(() => {
+            Application.Quit();
+        });
     }
     protected override void OnClose()
     {
