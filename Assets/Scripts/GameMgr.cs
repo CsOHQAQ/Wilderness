@@ -157,5 +157,6 @@ public enum ModuleEnum
     EventManager,
     ItemManager,
     GameTimeManager,
+    SkillManager,
     Max,
 }

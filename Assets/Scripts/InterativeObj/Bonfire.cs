@@ -7,10 +7,9 @@ using QxFramework.Core;
 public class Bonfire : Building
 {
     public float remainBurnMinute = 0f;//还能燃烧的分钟数
-    public bool isBurn = false;
-    public HeatSpot heatSpot;
-    private float baseHeat = 90f;
-    private float lightIntensity = 1;
+    public HeatSpot heatSpot;//由这个实例控制的热源
+    private float baseHeat = 90f;//热源的基础热度
+    private float lightIntensity = 1;//火焰的基础光照强度
     private Light2D fireLight;
 
 
@@ -32,12 +31,13 @@ public class Bonfire : Building
         heatSpot.warmRange = 10f;
         interactable = false;
     }
+
     public override void Interact(PlayerBase player)
     {
         base.Interact(player);
         if (player.backPackUI.GetCurrentItem() != null)
         {
-            if (player.backPackUI.GetCurrentItem().item.ItemCodeName == "Wood")//只有玩家当前选中的道具为木头才能交互
+            if (player.backPackUI.GetCurrentItem().item.ItemCodeName == "Wood")//只有玩家当前选中的道具为木头才能给篝火添加燃料
             {
                 GameMgr.Get<IItemManager>().RemoveItem(player.backPackUI.GetCurrentItem().CurrentPosID, 1, new CargoData[] { player.data.backpack });
                 remainBurnMinute += 60f;
@@ -46,7 +46,7 @@ public class Bonfire : Building
     }
     public override void Refresh(GameDateTime current)
     {
-        if (remainBurnMinute > 0)
+        if (remainBurnMinute > 0)//减少剩余燃烧时间
         {
             remainBurnMinute -= (current - lastVisitTime).TotalMinutes;
         }
@@ -54,6 +54,7 @@ public class Bonfire : Building
         {
             remainBurnMinute = 0;
         }
+        //更新光照的强度
         lightIntensity = BurnTimeToLightIntensity();
         fireLight.intensity = lightIntensity;
         heatSpot.heat = baseHeat * lightIntensity;

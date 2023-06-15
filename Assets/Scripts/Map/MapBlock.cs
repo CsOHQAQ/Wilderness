@@ -273,7 +273,16 @@ public class MapBlock:MonoBehaviour
             for (int itemId = 1; itemId <= objItemNum; itemId++)
             {
                 float range = rand.nextFloat()* objPointRange, angle=rand.nextFloat()*2*Mathf.PI;//生成随机半径和角度
-                InteractiveObj intObj = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Plant/WoodTree").GetComponent<InteractiveObj>();
+
+                InteractiveObj intObj;
+                if (rand.nextFloat() > 0.6f)
+                {
+                    intObj = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Plant/FruitTree").GetComponent<InteractiveObj>();
+                }
+                else
+                {
+                    intObj = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Plant/WoodTree").GetComponent<InteractiveObj>();
+                }               
                 intObj.transform.SetParent(this.transform);
                 intObj.transform.position = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * range + pointPos;
                 intObj.Init(this);                

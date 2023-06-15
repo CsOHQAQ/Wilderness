@@ -26,7 +26,7 @@ public class WoodTree : RenewableObj
         }
         Randomer rand = new Randomer();
         woodNum = rand.nextInt(1, 2);
-        if (rand.nextFloat() > 0.7f)//随机生成已经长好的树
+        if (rand.nextFloat() > 0.4f)//随机生成已经长好的树
         {
             growPercentage = maxGrowPercentage*(rand.nextFloat()*0.25f+0.75f);
             GrowFull();
