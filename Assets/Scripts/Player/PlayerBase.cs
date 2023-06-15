@@ -11,16 +11,22 @@ public class PlayerBase: MonoBehaviour
     //玩家GO的刚体
     [HideInInspector]
     public Rigidbody2D body;
+
     public bool canMove = true;
     [HideInInspector]
-    public float interactRange = 2f;
-    public float environmentTemp = 100f;
-    public bool isInteracting = false;
+    public float interactRange = 2f;//玩家的交互距离
 
-    private Action<PlayerBase> interactFunc;
+    public float environmentTemp = 100f;//感受到的环境温度
+
+    public bool isInteracting = false;//是否正在交互
+
+    public Action<PlayerBase> interactFunc;//玩家当前的交互事件
+    public Action<PlayerBase, string> buildFunc;//玩家当前的建筑事件
+    
+    //一些由playerBase打开的UI
     private CraftTableUI craftTable;
     private PlayerStateUI stateUI;
-    private BackPackUI backPackUI;
+    public BackPackUI backPackUI;
 
     public void Init(bool load=false)
     {
@@ -38,21 +44,12 @@ public class PlayerBase: MonoBehaviour
         backPackUI = UIManager.Instance.Open("BackPackUI",2,"",new CargoData[] { data.backpack } ).GetComponent<BackPackUI>();
     }
 
-    /// <summary>
-    /// 供外部调用的交互
-    /// </summary>
-    /// <param name="action"></param>
-    public void SetInteractFunc(Action<PlayerBase> action)
-    {
-        interactFunc = action;
-    }
-
-
     private void Update()
     {
         OpenCraftTable();
         Move();
         Interact();
+        UseItem();
         data.RefreshData(environmentTemp);
         
     }
@@ -68,7 +65,7 @@ public class PlayerBase: MonoBehaviour
     {
         bool isMoveX = false;
         bool isMoveY = false;
-        if (!isInteracting)
+        if (!isInteracting)//根据按键分别相对应方向移动
         {
             if (InputManager.Instance.GetButton(InputEnum.Up) && (!InputManager.Instance.GetButton(InputEnum.Down)))//向上移动
             {
@@ -91,7 +88,7 @@ public class PlayerBase: MonoBehaviour
                 body.velocity = new Vector2(data.Velocity, body.velocity.y);
             }
         }
-        if (!isMoveX)
+        if (!isMoveX)//若x轴/y轴没任何按键让其移动，则减少对应方向上的速度。
         {
             body.velocity = new Vector2(Mathf.Max(0,body.velocity.x-data.Velocity/5), body.velocity.y);
         }
@@ -122,9 +119,31 @@ public class PlayerBase: MonoBehaviour
             craftTable= UIManager.Instance.Open("CraftTableUI",2,"CraftTableUI",this).GetComponent<CraftTableUI>();
         }
     }
+    /// <summary>
+    /// 检查玩家是否要使用道具
+    /// </summary>
     public void UseItem()
     {
-        //if()
+        if (InputManager.Instance.GetButtonDown(InputEnum.UseItem)&&!isInteracting)
+        {
+            if (data.backpack.itemPiles.Count>0&& backPackUI.GetCurrentItem().item.ItemFunc != "")
+            {
+                if (backPackUI.GetCurrentItem().item.ItemType == ItemType.Building)//如果是建筑物就调用建筑函数
+                {
+                    Build();
+                }
+                else
+                {
+                    GameMgr.Get<IItemManager>().RemoveItem(backPackUI.GetCurrentItem().CurrentPosID, 1, new CargoData[] { data.backpack });
+                    GameMgr.Get<ISkillManager>().UseSkill(this, backPackUI.GetCurrentItem().item.ItemFunc);
+                }
+                
+            }
+        }
     }
-
+    public void Build()
+    {        
+        buildFunc.Invoke(this,backPackUI.GetCurrentItem().item.ItemFunc);
+        GameMgr.Get<IItemManager>().RemoveItem(backPackUI.GetCurrentItem().CurrentPosID, 1, new CargoData[] { data.backpack });
+    }
 }

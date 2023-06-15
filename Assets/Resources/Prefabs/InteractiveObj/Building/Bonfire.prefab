@@ -72,7 +72,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 13
   m_Sprite: {fileID: 21300000, guid: cf9ea11f4abe9a34eb44e81a59829d7a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -96,17 +96,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15c65b74fd55934499df114aad6c4763, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastVisitTime:
+    Days: 0
+    Hours: 0
+    Minutes: 0
+  interactable: 1
   buildingName: 
   needTime:
     Days: 0
     Hours: 0
     Minutes: 0
+  startBuildTime:
+    Days: 0
+    Hours: 0
+    Minutes: 0
   interactUI: {fileID: 0}
-  buildingProgress: 0
+  buildProgress: 0
+  isFinishBuild: 0
   remainBurnMinute: 0
   isBurn: 0
-  basicTemperature: 80
-  warmRange: 10
 --- !u!61 &8150184042409613714
 BoxCollider2D:
   m_ObjectHideFlags: 0

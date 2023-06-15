@@ -1,4 +1,4 @@
 ﻿/Items,CodeName,Name,Image,Price,Type,Description,MaxPile,Func
 1001,Wood,木头,wood,8,Material,木头,8,
 1002,Fruit,水果,fruit,4,Material,水果,10,Food:20
-2001,BonfireBuilder,建造篝火,bonfire,10,Building,在当前位置建造篝火,1,Build:Bonfire
+2001,BonfireBuilder,建造篝火,bonfire,10,Building,在当前位置建造篝火,1,Bonfire

@@ -17,13 +17,16 @@ public class MapManager:MonoBehaviour
     public Dictionary<Vector2Int, MapBlock> mapBlocks=new Dictionary<Vector2Int, MapBlock>();
     //需要刷新的区块列表
     public List<MapBlock> refreshingMapBlocks=new List<MapBlock>();
+    //场上存在的热源
+    public List<HeatSpot> heatSpots = new List<HeatSpot>();
     private List<MapBlock> removeRecord = new List<MapBlock>();
     
     //开始进入时的初始化，还没有接入存档系统
     public void Init(PlayerBase playerBase)
     {
         player = playerBase;
-        player.SetInteractFunc(Interact);
+        player.interactFunc = Interact;
+        player.buildFunc = Build;
         //如果有存档就在这里写读取罢！
 
         //在初始化大地图预先在玩家周围生成如下这么多个地块，防止后续卡顿
@@ -91,6 +94,8 @@ public class MapManager:MonoBehaviour
 
         mapBlocks[playerPos2MapBlockPos()].ChectInteractiveItem(player);//检测玩家所在区块是否存在进入交互范围的可交互物体
 
+        ChangeEnvironmentTemperature();
+
         SetPlayerTemperature();//设置玩家感受到的环境温度
 
         ShowBlockArea();//在Scene中显示区块的大小
@@ -119,6 +124,16 @@ public class MapManager:MonoBehaviour
         curBlock.Interact(player);
     }
 
+    private void Build(PlayerBase player,string buildingName)
+    {
+        MapBlock curBlock = mapBlocks[playerPos2MapBlockPos()];
+        curBlock.Build(player,buildingName,AddHeatSpot);
+    }
+
+    public void AddHeatSpot(HeatSpot heat)
+    {
+        heatSpots.Add(heat);
+    }
     /// <summary>
     /// 用于在debug时展现一个区块的范围
     /// </summary>
@@ -192,4 +207,76 @@ public class MapManager:MonoBehaviour
         y -= playerPos.y < 0 ? 1 : 0;
         return new Vector2Int(x*2*blockSize,y*2*blockSize);
     }
+    
+    /// <summary>
+    /// 根据热源修改环境温度
+    /// </summary>
+    private void ChangeEnvironmentTemperature()
+    {
+        foreach(var heat in heatSpots)
+        {
+
+            for (int i = 0; i <= Mathf.Sqrt(heat.warmRange); i++)
+            {
+                for (int j = 0; j * j + i * i <= heat.warmRange * heat.warmRange; j++)
+                {
+                    int x = 0, y = 0;
+                    //根据圆的对称性设置环境温度，下面分别是四个偏移的方向
+                    x = (int)((Mathf.Abs(heat.pos.x+j) + 0.5f) * Mathf.Sign(heat.pos.x));
+                    y = (int)((Mathf.Abs(heat.pos.y+i) + 0.5f) * Mathf.Sign(heat.pos.y));
+                    MapBlock mapBlock = mapBlocks[TransformToMapBlockPos(new Vector2(x, y))];//根据热源偏移后的坐标算出所属区块
+                    //将偏移后的坐标转换为所属区块内的坐标
+                    x -= mapBlock.leftDownPosition.x;
+                    y -= mapBlock.leftDownPosition.y;
+                    float temperature = -(heat.heat / heat.warmRange) * (Mathf.Sqrt(i * i + j * j)) + heat.heat;//计算该距离下的温度
+                    mapBlock.environmentTemperature[y, x] = Mathf.Max(mapBlock.environmentTemperature[y, x],heat.heat);
+
+                    x = (int)((Mathf.Abs(heat.pos.x - j) + 0.5f) * Mathf.Sign(heat.pos.x));
+                    y = (int)((Mathf.Abs(heat.pos.y + i) + 0.5f) * Mathf.Sign(heat.pos.y));
+                    mapBlock = mapBlocks[TransformToMapBlockPos(new Vector2(x, y))];//根据热源偏移后的坐标算出所属区块
+                    //将偏移后的坐标转换为所属区块内的坐标
+                    x -= mapBlock.leftDownPosition.x;
+                    y -= mapBlock.leftDownPosition.y;
+                    temperature = -(heat.heat / heat.warmRange) * (Mathf.Sqrt(i * i + j * j)) + heat.heat;//计算该距离下的温度
+                    mapBlock.environmentTemperature[y, x] = Mathf.Max(mapBlock.environmentTemperature[y, x], heat.heat);
+
+                    x = (int)((Mathf.Abs(heat.pos.x + j) + 0.5f) * Mathf.Sign(heat.pos.x));
+                    y = (int)((Mathf.Abs(heat.pos.y - i) + 0.5f) * Mathf.Sign(heat.pos.y));
+                    mapBlock = mapBlocks[TransformToMapBlockPos(new Vector2(x, y))];//根据热源偏移后的坐标算出所属区块
+                    //将偏移后的坐标转换为所属区块内的坐标
+                    x -= mapBlock.leftDownPosition.x;
+                    y -= mapBlock.leftDownPosition.y;
+                    temperature = -(heat.heat / heat.warmRange) * (Mathf.Sqrt(i * i + j * j)) + heat.heat;//计算该距离下的温度
+                    mapBlock.environmentTemperature[y, x] = Mathf.Max(mapBlock.environmentTemperature[y, x], heat.heat);
+
+                    x = (int)((Mathf.Abs(heat.pos.x - j) + 0.5f) * Mathf.Sign(heat.pos.x));
+                    y = (int)((Mathf.Abs(heat.pos.y - i) + 0.5f) * Mathf.Sign(heat.pos.y));
+                    mapBlock = mapBlocks[TransformToMapBlockPos(new Vector2(x, y))];//根据热源偏移后的坐标算出所属区块
+                    //将偏移后的坐标转换为所属区块内的坐标
+                    x -= mapBlock.leftDownPosition.x;
+                    y -= mapBlock.leftDownPosition.y;
+                    temperature = -(heat.heat / heat.warmRange) * (Mathf.Sqrt(i * i + j * j)) + heat.heat;//计算该距离下的温度
+                    mapBlock.environmentTemperature[y, x] = Mathf.Max(mapBlock.environmentTemperature[y, x], heat.heat);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 将坐标转化为所属区块的左下角坐标
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    private Vector2Int TransformToMapBlockPos(Vector2 pos)
+    {
+        int x = 0, y = 0;
+        x += (int)pos.x / (2 * blockSize);
+        x -= (int)pos.x < 0 ? 1 : 0;
+        y += (int)pos.y / (2 * blockSize);
+        y -= (int)pos.y < 0 ? 1 : 0;
+        x *= 2 * blockSize;
+        y *= 2 * blockSize;
+        return new Vector2Int(x, y);
+    }
 }
+

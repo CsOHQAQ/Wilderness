@@ -287,9 +287,14 @@ public class MapBlock:MonoBehaviour
     /// 在区块中开始建造建筑
     /// </summary>
     /// <param name="buildingName">生成建筑的名字</param>
-    private void StartBuilding(string buildingName)
+    public void Build(PlayerBase player,string buildingName,Action<HeatSpot> addHeatSpot=null)
     {
-
+        Building building = ResourceManager.Instance.Instantiate("Prefabs/InteractiveObj/Building/"+buildingName).GetComponent<Building>();
+        building.transform.position = player.transform.position - new Vector3(0, -2);
+        building.Init(this);
+        building.SetHeatSpot(addHeatSpot);
+        building.OnEnterBuild();
+        intObjList.Add(building);
     }
 
     /// <summary>
@@ -304,7 +309,7 @@ public class MapBlock:MonoBehaviour
         foreach (var intObj in intObjList)
         {
             float dis = Vector2.Distance(intObj.transform.position, player.transform.position);
-            if (dis < minDis && dis <= player.interactRange)
+            if (dis < minDis && dis <= player.interactRange&&intObj.interactable)
             {
                 obj = intObj;
                 minDis = dis;
@@ -339,21 +344,9 @@ public class MapBlock:MonoBehaviour
     /// <param name="player"></param>
     public void Interact(PlayerBase player)
     {
-        
-        InteractiveObj obj=null;
-        float minDistance = 1000000f;
-        foreach(var intObj in intObjList)
+        if (curInteractableObj != null)
         {
-            float distance = Vector2.Distance(intObj.transform.position, player.transform.position);
-            if (distance<player.interactRange&&distance<minDistance)
-            {
-                obj = intObj;
-                minDistance = distance;
-            }
-        }
-        if (obj != null)
-        {
-            obj.Interact(player); 
+            curInteractableObj.Interact(player); 
         }
     }
 }

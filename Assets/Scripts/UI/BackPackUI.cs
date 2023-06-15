@@ -74,6 +74,18 @@ public class BackPackUI : PackBase
     }
     public ItemPile GetCurrentItem()
     {
+        if (curItemPile == -1)//如果玩家按下交互键时还未选中任何物体
+        {
+            if (cargo[0].itemPiles.Count > 0)//只要有物品能选择，则返回第一个item
+            {
+                curItemPile = cargo[0].itemPiles[0].CurrentPosID;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
         return cargo[0].itemPiles[curItemPile];
     }
 }

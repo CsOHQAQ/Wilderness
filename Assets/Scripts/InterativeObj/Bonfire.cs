@@ -8,10 +8,10 @@ public class Bonfire : Building
 {
     public float remainBurnMinute = 0f;//还能燃烧的分钟数
     public bool isBurn = false;
-    public float basicTemperature = 80f;//开始燃烧之后的基础温度
-    public float warmRange = 10f;//温度最远传播距离
+    public HeatSpot heatSpot;
+    private float baseHeat = 80f;
     private float lightIntensity = 1;
-    private Light2D light;
+    private Light2D fireLight;
 
 
     public override void Init(MapBlock block, Object loadInstance = null)
@@ -21,25 +21,59 @@ public class Bonfire : Building
         {
             //读取存档数据
         }
-        light = GetComponent<Light2D>();
-        light.intensity = lightIntensity;
+        //初始化部分数据
+        fireLight = GetComponent<Light2D>();
+        fireLight.intensity = 0;
+        needTime = new GameDateTime();
+        needTime.Minutes = 30;
+        remainBurnMinute = 0f;
+        heatSpot = new HeatSpot();
+        heatSpot.pos = transform.position;
+        heatSpot.warmRange = 10f;
+        interactable = false;
     }
     public override void Interact(PlayerBase player)
     {
         base.Interact(player);
+        if (player.backPackUI.GetCurrentItem() != null)
+        {
+            if (player.backPackUI.GetCurrentItem().item.ItemCodeName == "Wood")//只有玩家当前选中的道具为木头才能交互
+            {
+                GameMgr.Get<IItemManager>().RemoveItem(player.backPackUI.GetCurrentItem().CurrentPosID, 1, new CargoData[] { player.data.backpack });
+                remainBurnMinute += 40f;
+            }
+        }
     }
-    public override void Refresh(GameDateTime jumpTime)
+    public override void Refresh(GameDateTime current)
     {
-        base.Refresh(jumpTime);
-        
+        if (remainBurnMinute > 0)
+        {
+            remainBurnMinute -= (current - lastVisitTime).TotalMinutes;
+        }
+        else
+        {
+            remainBurnMinute = 0;
+        }
+        lightIntensity = BurnTimeToLightIntensity();
+        fireLight.intensity = lightIntensity;
+        heatSpot.heat = baseHeat * lightIntensity;
+        base.Refresh(current);
     }
     public override void OnFinishBuild()
     {
+        setHeatSpot.Invoke(heatSpot);
         base.OnFinishBuild();
     }
     public override void OnDestory()
     {
         base.OnDestory();
+    }
+    private float BurnTimeToLightIntensity()
+    {
+        float declineTime = 60f;//亮度开始衰减时的亮度
+        if (remainBurnMinute >= declineTime)
+            return 1f;
+        return remainBurnMinute / declineTime;
     }
 
 }
