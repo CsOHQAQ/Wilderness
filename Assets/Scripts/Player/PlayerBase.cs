@@ -46,13 +46,21 @@ public class PlayerBase: MonoBehaviour
 
     private void Update()
     {
+        //检测玩家的按键输入
         OpenExitMenu();
         OpenCraftTable();
         Move();
         Interact();
         UseItem();
         data.RefreshData(environmentTemp);
-        
+
+        if (data.Health <= 0)//如果生命值过低，即销毁玩家，并打开重开的页面
+        {
+            UIManager.Instance.Open("GameOverUI");
+            OnDestroy();
+            GameObject.Destroy(this);
+        }
+
     }
     private void OnDestroy()
     {
@@ -150,9 +158,10 @@ public class PlayerBase: MonoBehaviour
 
     public void OpenExitMenu()
     {
-        if (InputManager.Instance.GetButtonDown(InputEnum.Quit))
+        if (InputManager.Instance.GetButtonDown(InputEnum.Quit)&&!isInteracting)
         {
             UIManager.Instance.Open("ExitMenuUI");
+            isInteracting = true;
         }
     }
 }

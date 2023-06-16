@@ -28,7 +28,8 @@ public class CraftTableUI : UIBase
         //初始化组件的部分值
         itemName.text = "合成表";
         itemDes.text = "";
-        confirmBtn.onClick.AddListener(() =>{
+        itemImg.sprite = ResourceManager.Instance.Load<Sprite>("Texture/UI/BaseFrame");
+        confirmBtn.onClick.SetListener(() =>{
             Craft();
         });
         confirmBtn.interactable = false;
@@ -52,6 +53,21 @@ public class CraftTableUI : UIBase
                 UIManager.Instance.Close(child);
             }
         }
+
+        childCount = Get<Transform>("NeedItemList").childCount;
+        for (int i = 0; i < childCount; i++)
+        {
+            UIBase child = Get<Transform>("NeedItemList").GetChild(0).GetComponent<UIBase>();
+            if (child == null)//如果存在不是UI的GameObj出现就删除
+            {
+                GameObject.Destroy(Get<Transform>("NeedItemList").GetChild(0).gameObject);
+            }
+            else//否则使用UIManager的正常关闭
+            {
+                UIManager.Instance.Close(child);
+            }
+        }
+
         #endregion
 
         #region 从CraftTable中获取所有的合成表
@@ -145,13 +161,13 @@ public class CraftTableUI : UIBase
             {
                 needItem.Get<Text>("Text").color = Color.white;
             }
-            #endregion
+            
 
-            confirmBtn.interactable = canCraft;
+         confirmBtn.interactable = canCraft;
         }
-
+        #endregion
     }
-    
+
     /// <summary>
     /// 按照当前选中的合成表合成一个物品
     /// </summary>

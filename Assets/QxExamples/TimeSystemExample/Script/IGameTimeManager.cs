@@ -10,6 +10,7 @@ public interface IGameTimeManager
     void DoStart();
     void Pause();
     bool IsPlaying();
+    void ResetTime();
     void RegisterTimeRepeat(Func<GameDateTime, bool> action, GameDateTime interval);
     bool StepMinute(float stepTime);
     bool IsDayTime();

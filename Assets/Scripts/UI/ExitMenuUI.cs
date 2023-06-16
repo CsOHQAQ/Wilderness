@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using QxFramework.Core;
 public class ExitMenuUI : UIBase
 {
+    private PlayerBase player;
     /// <summary>
     /// 三个按钮，分别对应返回游戏、返回标题、退出游戏
     /// </summary>
@@ -12,6 +13,7 @@ public class ExitMenuUI : UIBase
     public override void OnDisplay(object args)
     {
         base.OnDisplay(args);
+        player = (PlayerBase)args;
         Get<Button>("ReturnBtn").onClick.AddListener(()=> {
             UIManager.Instance.Close(this);
         });
@@ -28,6 +30,6 @@ public class ExitMenuUI : UIBase
     protected override void OnClose()
     {
         base.OnClose();
-
+        player.isInteracting = false;
     }
 }
