@@ -14,6 +14,7 @@ public class ItemManager : LogicModuleBase,IItemManager
     private void InitItemStatus()
     {
         Items = new Dictionary<int, Item>();
+        ItemsID = new Dictionary<string, int>();
         List<string> AllItemsStatus = QxFramework.Core.QXData.Instance.TableAgent.CollectKey1("Items");
         for(int i=0;i< AllItemsStatus.Count; i++)
         {

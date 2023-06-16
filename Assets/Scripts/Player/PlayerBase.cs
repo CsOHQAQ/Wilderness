@@ -160,7 +160,7 @@ public class PlayerBase: MonoBehaviour
     {
         if (InputManager.Instance.GetButtonDown(InputEnum.Quit)&&!isInteracting)
         {
-            UIManager.Instance.Open("ExitMenuUI");
+            UIManager.Instance.Open("ExitMenuUI",2,"",this);
             isInteracting = true;
         }
     }

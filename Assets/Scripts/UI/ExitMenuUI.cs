@@ -14,7 +14,14 @@ public class ExitMenuUI : UIBase
     {
         base.OnDisplay(args);
         player = (PlayerBase)args;
+        if (player == null)
+        {
+            Debug.LogError("#Test退出页面未获取到玩家类！");
+        }
         Get<Button>("ReturnBtn").onClick.AddListener(()=> {
+
+            if (player != null)
+                player.isInteracting = false;
             UIManager.Instance.Close(this);
         });
         Get<Button>("TitleBtn").onClick.AddListener(() => {
@@ -30,6 +37,7 @@ public class ExitMenuUI : UIBase
     protected override void OnClose()
     {
         base.OnClose();
-        player.isInteracting = false;
+        if(player!=null)
+            player.isInteracting = false;
     }
 }
