@@ -19,9 +19,7 @@ public class RenewableObj : InteractiveObj
 
     public override void Refresh(GameDateTime current)
     {
-        lastVisitTime= current;
-
-        
+        lastVisitTime= current;        
     }
     private void Update()
     {
